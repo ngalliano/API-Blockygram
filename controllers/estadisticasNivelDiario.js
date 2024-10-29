@@ -83,7 +83,8 @@ class dailyLevelStatController{
             
             console.log("hola");
             
-            const leaderBoard = []
+            const leaderBoard = [];
+            const leaderBoard2 = [];
             //const player = lista2.find((user) => user.idUsuario === idUsuario1);
             console.log(player.puestoClasificacion);
             
@@ -95,12 +96,24 @@ class dailyLevelStatController{
                     leaderBoard[10+i] = lista2[player.puestoClasificacion+i];
                 }
                 leaderBoard[10] = lista2[player.puestoClasificacion];
+                let j=0;
+                for (let i=0; i<19; i++){
+                    
+                    if (leaderBoard[i] != null){
+                        leaderBoard2[j] = leaderBoard[i];
+                        j = j + 1;
+                    }
+                }
+                console.log(leaderBoard2);
                 //leaderBoard = lista2.slice(player.puestoClasificacion-10,player.puestoClasificacion+10);
                 //console.log(leaderBoard);
             }
-            
+            else{
+                leaderBoard2 = lista2;
+            }
+                        
             console.log("hola");            
-            res.status(202).send(leaderBoard);
+            res.status(202).send(leaderBoard2);
             
         } catch (e) {
             res.status(500).send({error: e});    
