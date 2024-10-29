@@ -1,4 +1,4 @@
-import { DATE, where } from 'sequelize';
+import { and, DATE, where } from 'sequelize';
 import dailyLevelStatsModel from '../models/estadisticasNivelDiario.js';
 import fastifyMysql from '@fastify/mysql';
 
@@ -29,24 +29,84 @@ class dailyLevelStatController{
         }
     }
 
-   async getTop20 (req, res){
+    async getTop20 (req, res){
         try{
             const fecha1 = new Date();
-            const fecha2 = fecha1.getUTCDate().toString() + fecha1.getUTCMonth().toString() + fecha1.getUTCFullYear().toString();
-            
+            const fecha2 = fecha1.getUTCDate().toString() + (parseInt(fecha1.getUTCMonth().toString())+1).toString() + fecha1.getUTCFullYear().toString();
+            const index = 0
+            console.log(fecha2);
             const lista = await dailyLevelStatsModel.findAll({
+                attributes: ['puestoClasificacion','idUsuario','tiempoResolucion'],
                 where: {idNivel:parseInt(fecha2)},
-                atributtes: ['puestoClasificacion','idUsuario','tiempoResolucion']
+                limit: 20,
+                order: [['tiempoResolucion', 'ASC']]
             });
-            
-            console.log("hola");
+            const leaderBoard = lista.map((user, index) => ({
+                idUsuario: user.idUsuario,
+                puestoClasificacion: index + 1,
+                tiempoResolucion: user.tiempoResolucion
+            }));
+    
+            //console.log("hola");
   
-            res.status(202).send(lista);
+            res.status(202).send(leaderBoard);
         }catch (e){
             res.status(500).send({error: e}); 
         }
     }
     
+    async getPlayerPositionGroup (req, res) {
+        try {
+            const idUsuario1 = req.query.idUsuario;
+            const fecha1 = new Date();
+            const fecha2 = fecha1.getUTCDate().toString() + (parseInt(fecha1.getUTCMonth().toString())+1).toString() + fecha1.getUTCFullYear().toString();
+            console.log(fecha2);
+            const index = 0;
+            //const fecha2 = '27102024';
+            
+            console.log("hola");
+            //console.log(nivel);
+            const lista1 = await dailyLevelStatsModel.findAll({
+                attributes: ['puestoClasificacion','idUsuario','tiempoResolucion'],
+                where: {idNivel:parseInt(fecha2)},
+                order: [['tiempoResolucion', 'ASC']]
+            });
+            
+            const lista2 = lista1.map((user, index) => ({
+                idUsuario: user.idUsuario,
+                puestoClasificacion: index + 1,
+                tiempoResolucion: user.tiempoResolucion
+            }));
+                        
+            //console.log(lista2[0].idUsuario);
+            const player = lista2.find((element) => element.idUsuario === idUsuario1)
+            
+            console.log("hola");
+            
+            const leaderBoard = []
+            //const player = lista2.find((user) => user.idUsuario === idUsuario1);
+            console.log(player.puestoClasificacion);
+            
+            if (lista2.length > 20){
+                for (let i=0; i<10; i++){
+                    leaderBoard[i] = lista2[player.puestoClasificacion-(10-i+1)];
+                }
+                for (let i=1; i<9; i++){
+                    leaderBoard[10+i] = lista2[player.puestoClasificacion+i];
+                }
+                leaderBoard[10] = lista2[player.puestoClasificacion];
+                //leaderBoard = lista2.slice(player.puestoClasificacion-10,player.puestoClasificacion+10);
+                //console.log(leaderBoard);
+            }
+            
+            console.log("hola");            
+            res.status(202).send(leaderBoard);
+            
+        } catch (e) {
+            res.status(500).send({error: e});    
+        }
+    }
+
     async getOne (req, res) {
         try{
             const idNivel1 = req.query.idNivel;

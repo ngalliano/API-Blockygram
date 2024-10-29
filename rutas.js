@@ -75,9 +75,14 @@ const rutas = [
     },
     {
         method: "GET",
+        url: "/estadisticasnivelesDiarios/:idUsuario",
+        handler: dailyLevelStatController.getPlayerPositionGroup, 
+    },
+    /*{
+        method: "GET",
         url: "/estadisticasnivelesDiarios/:data1",
         handler: dailyLevelStatController.getOne, 
-    },
+    },*/
     {
         method: "PUT",
         url: "/estadisticasnivelesDiarios/:data",
