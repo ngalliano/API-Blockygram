@@ -32,7 +32,8 @@ class dailyLevelStatController{
     async getTop20 (req, res){
         try{
             const fecha1 = new Date();
-            const fecha2 = fecha1.getUTCDate().toString() + (parseInt(fecha1.getUTCMonth().toString())+1).toString() + fecha1.getUTCFullYear().toString();
+            //const fecha2 = fecha1.getUTCDate().toString() + (parseInt(fecha1.getUTCMonth().toString())+1).toString() + fecha1.getUTCFullYear().toString();
+            const fecha2 = '29102024';
             const index = 0
             console.log(fecha2);
             const lista = await dailyLevelStatsModel.findAll({
@@ -59,10 +60,10 @@ class dailyLevelStatController{
         try {
             const idUsuario1 = req.query.idUsuario;
             const fecha1 = new Date();
-            const fecha2 = fecha1.getUTCDate().toString() + (parseInt(fecha1.getUTCMonth().toString())+1).toString() + fecha1.getUTCFullYear().toString();
-            console.log(fecha2);
+            //const fecha2 = fecha1.getUTCDate().toString() + (parseInt(fecha1.getUTCMonth().toString())+1).toString() + fecha1.getUTCFullYear().toString();
+            //console.log(fecha2);
             const index = 0;
-            //const fecha2 = '27102024';
+            const fecha2 = '29102024';
             
             console.log("hola");
             //console.log(nivel);
@@ -89,22 +90,26 @@ class dailyLevelStatController{
             console.log(player.puestoClasificacion);
             
             if (lista2.length > 20){
+                for (let i=0; i<11; i++){
+                    leaderBoard[i] = lista2[player.puestoClasificacion-(10-i)-1];
+                    console.log(player.puestoClasificacion-(10-i)-1);
+                    console.log(i);
+                }
                 for (let i=0; i<10; i++){
-                    leaderBoard[i] = lista2[player.puestoClasificacion-(10-i+1)];
+                    leaderBoard[11+i] = lista2[player.puestoClasificacion+i];
+                    console.log(player.puestoClasificacion+i);
+                    console.log(11+i);
                 }
-                for (let i=1; i<9; i++){
-                    leaderBoard[10+i] = lista2[player.puestoClasificacion+i];
-                }
-                leaderBoard[10] = lista2[player.puestoClasificacion];
+                
                 let j=0;
-                for (let i=0; i<19; i++){
+                for (let i=0; i<20; i++){
                     
                     if (leaderBoard[i] != null){
                         leaderBoard2[j] = leaderBoard[i];
                         j = j + 1;
                     }
                 }
-                console.log(leaderBoard2);
+                //console.log(leaderBoard2);
                 //leaderBoard = lista2.slice(player.puestoClasificacion-10,player.puestoClasificacion+10);
                 //console.log(leaderBoard);
             }
