@@ -21,7 +21,7 @@ class dailyLevelController{
         try{
             const where = {...req.query};
             const lista = await dailyLevelModel.findAll({where});
-            res.status(201).send(lista);    
+            res.status(200).send(lista);    
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -33,7 +33,7 @@ class dailyLevelController{
             const nivel = await dailyLevelModel.findByPk(idNivel);
             
             if(nivel) {
-                res.status(201).send(nivel);
+                res.status(200).send(nivel);
             }else{
                 res.status(404).send(
                     {message: 'Daily level not found'}
@@ -48,12 +48,16 @@ class dailyLevelController{
         try{
             const idNivel1 = req.params.idNivel;
             const data = {...req.body};
-           
+            if (data.idNivel != idNivel1){
+                res.status(400).send(
+                    {message: 'Data in body and query of request is different'}
+                );
+            }
             const nivel = await dailyLevelModel.update({tipoNivel:data.tipoNivel,estructuraNivel:data.estructuraNivel,estructuraParedes:data.estructuraParedes,listaPiezasNivel:data.listaPiezasNivel},
                 {where: {idNivel:idNivel1}});
             
             if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                res.status(201).send({
+                res.status(200).send({
                     status: true,
                 });
             }else{
@@ -73,7 +77,9 @@ class dailyLevelController{
             const nivel = await dailyLevelModel.destroy({where: {idNivel}});
             
             if(nivel) {
-                res.status(201).send({status: true});
+                res.status(200).send(
+                    {message: 'Daily level succesfully deleted'}
+                );
             }else{
                 res.status(404).send(
                     {message: 'Daily level not found'}

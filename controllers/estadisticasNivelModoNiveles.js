@@ -10,7 +10,7 @@ class levelModeLevelStatController{
             const levelModeLevelStat = await levelModeLevelStatsModel.create(req.body);
         
             if (levelModeLevelStat)
-                res.status(203).send({status: 'Level Stat Created Succesfully'});
+                res.status(201).send({status: 'Level Stat Created Succesfully'});
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -20,7 +20,7 @@ class levelModeLevelStatController{
         try{
             const where = {...req.query};
             const lista = await levelModeLevelStatsModel.findAll({where});
-            res.status(203).send(lista);    
+            res.status(200).send(lista);    
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -36,7 +36,7 @@ class levelModeLevelStatController{
             });
             
             if(nivel) {
-                res.status(203).send(nivel);
+                res.status(200).send(nivel);
             }else{
                 res.status(404).send(
                     {message: 'Level stat not found'}
@@ -53,11 +53,16 @@ class levelModeLevelStatController{
             const idNivel1 = req.query.idNivel;
             const idUsuario1 = req.query.idUsuario;
             //console.log(idNivel1);
+            if (data1.idUsuario != idUsuario1 || data1.idNivel != idNivel1){
+                res.status(400).send(
+                    {message: 'Data in body and query of request is different'}
+                );
+            }
             const nivel = await levelModeLevelStatsModel.update({mejorTiempoResolucion:data1.mejorTiempoResolucion},
                 {where: {idNivel:idNivel1, idUsuario:idUsuario1}});
             //console.log('Hola');            
             if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                res.status(203).send({
+                res.status(200).send({
                     status: true,
                 });
             }else{
@@ -78,7 +83,9 @@ class levelModeLevelStatController{
             const nivel = await levelModeLevelStatsModel.destroy({where: {idNivel:idNivel1, idUsuario:idUsuario1}});
             
             if(nivel) {
-                res.status(201).send({status: true});
+                res.status(200).send(
+                    {message: 'Level stat succesfully deleted'}
+                );
             }else{
                 res.status(404).send(
                     {message: 'Level stat not found'}
