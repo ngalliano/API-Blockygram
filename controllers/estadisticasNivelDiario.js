@@ -132,8 +132,9 @@ class dailyLevelStatController{
                         
                         console.log(i);
                     }
+                    console.log("AAA");
                     for (let i=player.puestoClasificacion-1; i<player.puestoClasificacion+8; i++){
-                        leaderBoard[i] = lista2[i];
+                        leaderBoard[i] = lista2[i+1];
                         
                         console.log(i);
                     }
