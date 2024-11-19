@@ -7,6 +7,11 @@ const playerModel = db.define('jugadores', {
         primaryKey: true,
         allowNull: false,
     },
+    nombreUsuario: {
+        type: sequilize.STRING,
+        primaryKey: false,
+        allowNull: false,
+    },
     listaCantidadNivelesCompletadosGrupo: {
         type: sequilize.STRING,
         allowNull: false,
@@ -20,6 +25,10 @@ const playerModel = db.define('jugadores', {
         allowNull: false,
     },
     mejorTiempoNivelDiario:{
+        type: sequilize.FLOAT,
+        allowNull: false,
+    },
+    mejorPuestoClasificacionEnPorcentaje:{
         type: sequilize.FLOAT,
         allowNull: false,
     },

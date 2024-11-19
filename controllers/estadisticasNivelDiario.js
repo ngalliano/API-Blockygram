@@ -1,6 +1,7 @@
 import { and, DATE, where } from 'sequelize';
 import dailyLevelStatsModel from '../models/estadisticasNivelDiario.js';
 import fastifyMysql from '@fastify/mysql';
+import playerModel from '../models/Jugadores.js';
 
 class dailyLevelStatController{
     constructor(){
@@ -9,11 +10,11 @@ class dailyLevelStatController{
 
     async create (req, res) {
         try{
-            console.log(req.body);
+            //console.log(req.body);
             const lista = await dailyLevelStatsModel.findAll(
                 {where:{ idNivel:req.body.idNivel, idUsuario:req.body.idUsuario}}
             );
-            console.log(lista.length);
+            console.log(req.body);
             if (lista.length == 0){
                 const dailyLevelStat = await dailyLevelStatsModel.create(req.body);
                 if (dailyLevelStat)
@@ -54,13 +55,13 @@ class dailyLevelStatController{
             const index = 0
             console.log(fecha2);
             const lista = await dailyLevelStatsModel.findAll({
-                attributes: ['puestoClasificacion','idUsuario','tiempoResolucion'],
+                attributes: ['puestoClasificacion','nombreUsuario','tiempoResolucion'],
                 where: {idNivel:parseInt(fecha2)},
                 limit: 20,
                 order: [['tiempoResolucion', 'ASC']]
             });
             const leaderBoard = lista.map((user, index) => ({
-                idUsuario: user.idUsuario,
+                nombreUsuario: user.nombreUsuario,
                 puestoClasificacion: index + 1,
                 tiempoResolucion: user.tiempoResolucion
             }));

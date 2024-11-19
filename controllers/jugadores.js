@@ -1,3 +1,4 @@
+import dailyLevelStatsModel from '../models/estadisticasNivelDiario.js';
 import playerModel from '../models/Jugadores.js';
 
 class playerController{
@@ -48,6 +49,9 @@ class playerController{
             if (typeof(req.body.idUsuario) != "string"){
                 res.status(400).send({message: 'Invalid user id format'});
             }
+            if (typeof(req.body.nombreUsuario) != "string"){
+                res.status(400).send({message: 'Invalid user name format'});
+            }
             //console.log('CHAU');
             if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
                 res.status(400).send({message: 'Invalid list of completed levels by group format'});
@@ -73,6 +77,12 @@ class playerController{
             }
             else if(req.body.mejorTiempoNivelDiario != 1000.0){
                 res.status(422).send({message: 'Best daily level time must be 1000.0'});
+            }
+            if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
+                res.status(400).send({message: 'Invalid best number of classification % format'});
+            }
+            else if(req.body.mejorPuestoClasificacionEnPorcentaje != 100.0){
+                res.status(422).send({message: 'Best number of classification % must be 100.0'});
             }
             if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
                 res.status(400).send({message: 'Invalid number of classification 1% format'});
@@ -106,6 +116,31 @@ class playerController{
             const player = await playerModel.findByPk(idUsuario);
             
             if(player) {
+                /*const listaNivelesDiarios = await dailyLevelStatsModel.findAll({
+                    where: {idUsuario: player.idUsuario},
+                    atributes: ['tiempoResolucion', 'estadoClasificacion1', 'puestoClasificacion'],
+                    order: [['tiempoResolucion', 'ASC']]
+                });
+                
+                let cantidadClasificaciones = 0;
+                listaNivelesDiarios.forEach(stat => {
+                    if (stat.estadoClasificacion1 == true){
+                        cantidadClasificaciones += 1;
+                    }
+                });
+                
+                const player2 = player.map((jugador) => ({
+                    idUsuario: jugador.idUsuario,
+                    nombreUsuario: jugador.nombreUsuario,
+                    listaCantidadNivelesCompletadosGrupo: jugador.listaCantidadNivelesCompletadosGrupo,
+                    cantidadNivelesDiariosCompletados: listaNivelesDiarios.length,
+                    cantidadPistas : jugador.cantidadPistas,
+                    mejorTiempoNivelDiario: listaNivelesDiarios[0].tiempoResolucion,
+                    cantidadVecesClasificacion1: cantidadClasificaciones,
+                    mejorPuestoClasificacionEnPorcentaje: jugador.mejorPuestoClasificacionEnPorcentaje,
+                }))
+                */
+                 
                 res.status(200).send(player);
             }else{
                 res.status(404).send(
@@ -170,24 +205,45 @@ class playerController{
             if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
                 res.status(400).send({message: 'Invalid list of completed levels by group format'});
             }
+            if (typeof(req.body.nombreUsuario) != "string"){
+                res.status(400).send({message: 'Invalid user name format'});
+            }
             else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo.toString())){
                 res.status(422).send({message: 'At least one of completed levels by group is invalid'})
             }
             if (typeof(req.body.cantidadNivelesDiariosCompletados) != "number"){
                 res.status(400).send({message: 'Invalid daily levels completed format'});
             }
+            else if (req.body.cantidadNivelesDiariosCompletados < 0){
+                res.status(422).send({message: 'Number of daily levels completed must be positive'});
+            }
             console.log('CHAU X2');
             if (typeof(req.body.cantidadPistas) != "number"){
                 res.status(400).send({message: 'Invalid number of tracks format'});
             }
+            else if (req.body.cantidadPistas < 0){
+                res.status(422).send({message: 'Number of tracks must be positive'});
+            }
             if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
                 res.status(400).send({message: 'Invalid best daily level time format'});
+            }
+            else if (req.body.mejorTiempoNivelDiario < 0){
+                res.status(422).send({message: 'Best daily level time must be positive'});
+            }
+            if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
+                res.status(400).send({message: 'Invalid best number of classification % format'});
+            }
+            else if (req.body.mejorPuestoClasificacionEnPorcentaje < 0){
+                res.status(422).send({message: 'Best number of classification % format must be positive'});
             }
             if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
                 res.status(400).send({message: 'Invalid number of classification 1% format'});
             }
+            else if (req.body.cantidadVecesClasificacion1 < 0){
+                res.status(422).send({message: 'Number of classification 1% must be positive'});
+            }
             
-            const player = await playerModel.update({listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
+            const player = await playerModel.update({nombreUsuario:data.nombreUsuario,listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:data.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
                 {where: {idUsuario:idUsuario1}});
             
             if (typeof (player[0]) != 'undefined' && player[0] === 1){
