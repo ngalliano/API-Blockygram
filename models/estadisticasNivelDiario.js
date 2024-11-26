@@ -16,10 +16,6 @@ const dailyLevelStatsModel = db.define('estadisticasNivelDiario', {
         type: sequilize.INTEGER,
         allowNull: false,
     },
-    estadoNivel:{
-        type: sequilize.BOOLEAN,
-        allowNull: false,
-    },
     estadoClasificacion1:{
         type: sequilize.BOOLEAN,
         allowNull: false,

@@ -10,7 +10,7 @@ class levelModeLevelStatController{
             const levelModeLevelStat = await levelModeLevelStatsModel.create(req.body);
         
             if (levelModeLevelStat)
-                res.status(201).send({status: 'Level Stat Created Succesfully'});
+                res.status(201).send({message: 'Level stat created succesfully'});
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -63,7 +63,7 @@ class levelModeLevelStatController{
             //console.log('Hola');            
             if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
                 res.status(200).send({
-                    status: true,
+                    message: 'Level stat updated succesfully',
                 });
             }else{
                 res.status(404).send(
@@ -84,7 +84,7 @@ class levelModeLevelStatController{
             
             if(nivel) {
                 res.status(200).send(
-                    {message: 'Level stat succesfully deleted'}
+                    {message: 'Level stat deleted succesfully'}
                 );
             }else{
                 res.status(404).send(

@@ -18,7 +18,7 @@ class dailyLevelStatController{
             if (lista.length == 0){
                 const dailyLevelStat = await dailyLevelStatsModel.create(req.body);
                 if (dailyLevelStat)
-                    res.status(201).send({status: 'Daily Level Stat Created Succesfully'});
+                    res.status(201).send({message: 'Daily level stat created succesfully'});
             }
             else{
                 res.status(500).send({message: 'Daily Level Stat already exist'});
@@ -128,15 +128,18 @@ class dailyLevelStatController{
                     }
                 }
                 if (player.puestoClasificacion >= 11 && player.puestoClasificacion < lista2.length-9){
-                    for (let i=0; i<11; i++){
-                        leaderBoard[i] = lista2[player.puestoClasificacion-(11-i)];
-                        
+                    let j=0;
+                    for (let i=player.puestoClasificacion-10; i<player.puestoClasificacion; i++){
+                        leaderBoard[j] = lista2[i];
+                        j++;
+                        console.log(j);
                         console.log(i);
                     }
                     console.log("AAA");
-                    for (let i=player.puestoClasificacion-1; i<player.puestoClasificacion+8; i++){
-                        leaderBoard[i] = lista2[i+1];
-                        
+                    for (let i=player.puestoClasificacion; i<player.puestoClasificacion+10; i++){
+                        leaderBoard[j] = lista2[i];
+                        j++;
+                        console.log(j);
                         console.log(i);
                     }
                 }
@@ -148,7 +151,9 @@ class dailyLevelStatController{
                 }
             }
             else{
-                leaderBoard = lista2;
+                for (let i = 0; i<lista2.length; i++){
+                    leaderBoard[i] = lista2[i];
+                }
             }
                         
             console.log("hola");            
@@ -196,7 +201,7 @@ class dailyLevelStatController{
             //console.log('Hola');            
             if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
                 res.status(200).send({
-                    status: true,
+                    message: 'Daily level stat updated succesfully',
                 });
             }else{
                 res.status(404).send(
@@ -217,7 +222,7 @@ class dailyLevelStatController{
             
             if(nivel) {
                 res.status(200).send(
-                    {message: 'Daily level stat succesfully deleted'}
+                    {message: 'Daily level stat deleted succesfully'}
                 );
             }else{
                 res.status(404).send(

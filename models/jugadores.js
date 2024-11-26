@@ -24,6 +24,10 @@ const playerModel = db.define('jugadores', {
         type: sequilize.INTEGER,
         allowNull: false,
     },
+    cantidadPistasAux: {
+       type: sequilize.INTEGER,
+       allowNull: false, 
+    },
     mejorTiempoNivelDiario:{
         type: sequilize.FLOAT,
         allowNull: false,

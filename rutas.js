@@ -63,26 +63,26 @@ const rutas = [
         url: "/estadisticasnivelesDiarios",
         handler: dailyLevelStatController.create,
     },
-    /*{
-        method: "GET",
-        url: "/estadisticasnivelesDiarios",
-        handler: dailyLevelStatController.getAll, 
-    },*/
     {
         method: "GET",
         url: "/estadisticasnivelesDiarios",
+        handler: dailyLevelStatController.getAll, 
+    },
+    {
+        method: "GET",
+        url: "/estadisticasnivelesDiarios/top20",
         handler: dailyLevelStatController.getTop20, 
     },
     {
         method: "GET",
-        url: "/estadisticasnivelesDiarios/:idUsuario",
+        url: "/estadisticasnivelesDiarios/topJugador/:idUsuario",
         handler: dailyLevelStatController.getPlayerPositionGroup, 
     },
-    /*{
+    {
         method: "GET",
         url: "/estadisticasnivelesDiarios/:data1",
         handler: dailyLevelStatController.getOne, 
-    },*/
+    },
     {
         method: "PUT",
         url: "/estadisticasnivelesDiarios/:data",

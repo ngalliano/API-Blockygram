@@ -13,10 +13,6 @@ const levelModeLevelStatsModel = db.define('estadisticasNivelModoNiveles', {
         type: sequilize.FLOAT,
         allowNull: false,
     },
-    estadoNivel:{
-        type: sequilize.BOOLEAN,
-        allowNull: false,
-    },
 });
 
 playerModel.hasMany(levelModeLevelStatsModel, {

@@ -10,7 +10,7 @@ class dailyLevelController{
             const dailyLevel = await dailyLevelModel.create(req.body);
         
             if (dailyLevel)
-                res.status(201).send({status: 'Daily Level Created Succesfully'});
+                res.status(201).send({message: 'Daily level created succesfully'});
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -58,7 +58,7 @@ class dailyLevelController{
             
             if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
                 res.status(200).send({
-                    status: true,
+                    message: 'Daily level updated succesfully',
                 });
             }else{
                 res.status(404).send(
@@ -78,7 +78,7 @@ class dailyLevelController{
             
             if(nivel) {
                 res.status(200).send(
-                    {message: 'Daily level succesfully deleted'}
+                    {message: 'Daily level deleted succesfully'}
                 );
             }else{
                 res.status(404).send(

@@ -46,55 +46,81 @@ class playerController{
             return true;
         }    
         try{
-            if (typeof(req.body.idUsuario) != "string"){
-                res.status(400).send({message: 'Invalid user id format'});
-            }
-            if (typeof(req.body.nombreUsuario) != "string"){
-                res.status(400).send({message: 'Invalid user name format'});
-            }
-            //console.log('CHAU');
-            if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
-                res.status(400).send({message: 'Invalid list of completed levels by group format'});
-            }
-            else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo.toString())){
-                res.status(422).send({message: 'At least one of completed levels by group is invalid'})
-            }
-            if (typeof(req.body.cantidadNivelesDiariosCompletados) != "number"){
-                res.status(400).send({message: 'Invalid daily levels completed format'});
-            }
-            else if(req.body.cantidadNivelesDiariosCompletados != 0){
-                res.status(422).send({message: 'Daily levels completed must be 0'});
-            }
-            console.log('CHAU X2');
-            if (typeof(req.body.cantidadPistas) != "number"){
-                res.status(400).send({message: 'Invalid number of tracks format'});
-            }
-            else if(req.body.cantidadPistas != 5){
-                res.status(422).send({message: 'Number of tracks must be 5'});
-            }
-            if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
-                res.status(400).send({message: 'Invalid best daily level time format'});
-            }
-            else if(req.body.mejorTiempoNivelDiario != 1000.0){
-                res.status(422).send({message: 'Best daily level time must be 1000.0'});
-            }
-            if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
-                res.status(400).send({message: 'Invalid best number of classification % format'});
-            }
-            else if(req.body.mejorPuestoClasificacionEnPorcentaje != 100.0){
-                res.status(422).send({message: 'Best number of classification % must be 100.0'});
-            }
-            if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
-                res.status(400).send({message: 'Invalid number of classification 1% format'});
-            }
-            else if(req.body.cantidadVecesClasificacion1 != 0){
-                res.status(422).send({message: 'Number of classification 1% must be 0'});
-            }
+            let aux = 0;
+                if (typeof(req.body.idUsuario) != "string"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid user id format'});
+                }
+                if (typeof(req.body.nombreUsuario) != "string"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid user name format'});
+                }
+                //console.log('CHAU');
+                if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid list of completed levels by group format'});
+                }
+                else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo.toString())){
+                    aux += 1;
+                    res.status(422).send({message: 'At least one of completed levels by group is invalid'})
+                }
+                if (typeof(req.body.cantidadNivelesDiariosCompletados) != "number"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid daily levels completed format'});
+                }
+                else if(req.body.cantidadNivelesDiariosCompletados != 0){
+                    aux += 1;
+                    res.status(422).send({message: 'Invalid daily levels completed value'});
+                }
+                console.log('CHAU X2');
+                if (typeof(req.body.cantidadPistas) != "number"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid number of tracks format'});
+                }
+                else if(req.body.cantidadPistas != 5){
+                    aux += 1;
+                    res.status(422).send({message: 'Invalid number of tracks value'});
+                }
+                if (typeof(req.body.cantidadPistasAux) != "number"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid number of tracks aux format'});
+                }
+                else if(req.body.cantidadPistasAux != 0){
+                    aux += 1;
+                    res.status(422).send({message: 'Invalid number of tracks aux value'});
+                }
+                if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid best daily level time format'});
+                }
+                else if(req.body.mejorTiempoNivelDiario != 1000.0){
+                    aux += 1;
+                    res.status(422).send({message: 'Invalid best daily level time value'});
+                }
+                if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid best number of classification % format'});
+                }
+                else if(req.body.mejorPuestoClasificacionEnPorcentaje != 100.0){
+                    aux += 1;
+                    res.status(422).send({message: 'Invalid best number of classification % value'});
+                }
+                if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
+                    aux += 1;
+                    res.status(400).send({message: 'Invalid number of classification 1% format'});
+                }
+                else if(req.body.cantidadVecesClasificacion1 != 0){
+                    aux += 1;
+                    res.status(422).send({message: 'Invalid number of classification 1% value'});
+                }
+            if (aux == 0){
+                const player = await playerModel.create(req.body);
+                
+                if (player)
+                    res.status(201).send({message: 'Player created succesfully'});
+            }    
             
-            const player = await playerModel.create(req.body);
         
-            if (player)
-                res.status(201).send({status: 'Player Created Succesfully'});
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -195,7 +221,9 @@ class playerController{
             const idUsuario1 = req.params.idUsuario;
             //console.log(req.params);
             const data = {...req.body};
+            let aux = 0;
             if (data.idUsuario != idUsuario1){
+                aux += 1;
                 res.status(400).send(
                     {message: 'Data in body and query of request is different'}
                 );
@@ -203,58 +231,81 @@ class playerController{
             
             //console.log('CHAU');
             if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid list of completed levels by group format'});
             }
             if (typeof(req.body.nombreUsuario) != "string"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid user name format'});
             }
             else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo.toString())){
+                aux += 1;
                 res.status(422).send({message: 'At least one of completed levels by group is invalid'})
             }
             if (typeof(req.body.cantidadNivelesDiariosCompletados) != "number"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid daily levels completed format'});
             }
             else if (req.body.cantidadNivelesDiariosCompletados < 0){
-                res.status(422).send({message: 'Number of daily levels completed must be positive'});
+                aux += 1;
+                res.status(422).send({message: 'Invalid daily levels completed value'});
             }
             console.log('CHAU X2');
             if (typeof(req.body.cantidadPistas) != "number"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid number of tracks format'});
             }
             else if (req.body.cantidadPistas < 0){
-                res.status(422).send({message: 'Number of tracks must be positive'});
+                aux += 1;
+                res.status(422).send({message: 'Invalid number of tracks value'});
+            }
+            if (typeof(req.body.cantidadPistasAux) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid number of tracks aux format'});
+            }
+            else if(req.body.cantidadPistasAux < 0){
+                aux += 1;
+                res.status(422).send({message: 'Invalid number of tracks aux value'});
             }
             if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid best daily level time format'});
             }
             else if (req.body.mejorTiempoNivelDiario < 0){
-                res.status(422).send({message: 'Best daily level time must be positive'});
+                aux += 1;
+                res.status(422).send({message: 'Invalid best daily level time value'});
             }
             if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid best number of classification % format'});
             }
             else if (req.body.mejorPuestoClasificacionEnPorcentaje < 0){
-                res.status(422).send({message: 'Best number of classification % format must be positive'});
+                aux += 1;
+                res.status(422).send({message: 'Invalid best number of classification % value'});
             }
             if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
+                aux += 1;
                 res.status(400).send({message: 'Invalid number of classification 1% format'});
             }
             else if (req.body.cantidadVecesClasificacion1 < 0){
-                res.status(422).send({message: 'Number of classification 1% must be positive'});
+                aux += 1;
+                res.status(422).send({message: 'Invalid number of classification 1% value'});
+            }
+            if (aux == 0){
+                const player = await playerModel.update({nombreUsuario:data.nombreUsuario,listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:data.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
+                    {where: {idUsuario:idUsuario1}});
+                
+                if (typeof (player[0]) != 'undefined' && player[0] === 1){
+                    res.status(200).send({
+                        message: 'Player updated succesfully'
+                    });
+                }else{
+                    res.status(404).send(
+                        {message: 'Player not found'}
+                    );   
+                }  
             }
             
-            const player = await playerModel.update({nombreUsuario:data.nombreUsuario,listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:data.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
-                {where: {idUsuario:idUsuario1}});
-            
-            if (typeof (player[0]) != 'undefined' && player[0] === 1){
-                res.status(200).send({
-                    status: true,
-                });
-            }else{
-                res.status(404).send(
-                    {message: 'Player not found'}
-                );   
-            }  
 
         }catch (e) {
             res.status(500).send({error: e});
@@ -269,7 +320,7 @@ class playerController{
             
             if(player) {
                 res.status(200).send(
-                    {message: 'Player succesfully deleted'}
+                    {message: 'Player deleted succesfully'}
                 );
             }else{
                 res.status(404).send(
