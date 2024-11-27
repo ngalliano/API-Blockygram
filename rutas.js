@@ -44,6 +44,11 @@ const rutas = [
     },
     {
         method: "GET",
+        url: "/nivelesDiarios/fechaActual",
+        handler: dailyLevelController.getDate, 
+    },
+    {
+        method: "GET",
         url: "/nivelesDiarios/:idNivel",
         handler: dailyLevelController.getOne, 
     },

@@ -292,7 +292,7 @@ class playerController{
                 res.status(422).send({message: 'Invalid number of classification 1% value'});
             }
             if (aux == 0){
-                const player = await playerModel.update({nombreUsuario:data.nombreUsuario,listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:data.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
+                const player = await playerModel.update({nombreUsuario:data.nombreUsuario,listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,cantidadPistasAux:data.cantidadPistasAux,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:data.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
                     {where: {idUsuario:idUsuario1}});
                 
                 if (typeof (player[0]) != 'undefined' && player[0] === 1){

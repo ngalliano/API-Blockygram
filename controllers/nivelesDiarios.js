@@ -17,6 +17,27 @@ class dailyLevelController{
         
     }
 
+    async getDate (req, res) {
+        try{
+            const fecha1 = new Date();
+            const opciones = {
+                timeZone: 'America/Argentina/Buenos_Aires',
+                year: 'numeric',
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit'
+            };
+            const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
+            const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
+            res.status(200).send(fecha2);    
+        }
+        catch{
+            res.status(500).send({error: e});
+        }
+    }
+
     async getAll (req, res) {
         try{
             const where = {...req.query};
