@@ -11,18 +11,45 @@ class dailyLevelStatController{
     async create (req, res) {
         try{
             //console.log(req.body);
-            const lista = await dailyLevelStatsModel.findAll(
-                {where:{ idNivel:req.body.idNivel, idUsuario:req.body.idUsuario}}
-            );
+            let aux = 0;
+            if (typeof(req.body.tiempoResolucion) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level time format'});
+            }
+            else if(req.body.tiempoResolucion < 0){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level time value'});
+            }
+            if (typeof(req.body.puestoClasificacion) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid number of classification format'});
+            }
+            else if(req.body.puestoClasificacion < 0 || parseInt(req.body.puestoClasificacion) - req.body.puestoClasificacion != 0 || req.body.puestoClasificacion != 100){
+                aux += 1;
+                res.status(422).send({message: 'Invalid number of classification value'});
+            }
+            if (typeof(req.body.estadoClasificacion1) != "boolean"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid state of classification 1% format'});
+            }
+            else if (req.body.estadoClasificacion1 != false){
+                aux += 1;
+                res.status(422).send({message: 'Invalid state of classification 1% value'});
+            }
+            if (aux == 0){
+                const lista = await dailyLevelStatsModel.findAll(
+                    {where:{ idNivel:req.body.idNivel, idUsuario:req.body.idUsuario}}
+                );
+                if (lista.length == 0){
+                    const dailyLevelStat = await dailyLevelStatsModel.create(req.body);
+                    if (dailyLevelStat)
+                        res.status(201).send({message: 'Daily level stat created succesfully'});
+                }
+                else{
+                    res.status(500).send({message: 'Daily Level Stat already exist'});
+                }
+            }
             console.log(req.body);
-            if (lista.length == 0){
-                const dailyLevelStat = await dailyLevelStatsModel.create(req.body);
-                if (dailyLevelStat)
-                    res.status(201).send({message: 'Daily level stat created succesfully'});
-            }
-            else{
-                res.status(500).send({message: 'Daily Level Stat already exist'});
-            }
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -200,6 +227,7 @@ class dailyLevelStatController{
     
     async update (req, res) {
         try{
+            let aux = 0;
             const data1 = {...req.body};
             const idNivel1 = req.query.idNivel;
             const idUsuario1 = req.query.idUsuario;
@@ -209,18 +237,33 @@ class dailyLevelStatController{
                     {message: 'Data in body and query of request is different'}
                 );
             }
-            const nivel = await dailyLevelStatsModel.update({nombreUsuario:data1.nombreUsuario,puestoClasificacion:data1.puestoClasificacion, estadoClasificacion1:data1.estadoClasificacion1},
-                {where: {idNivel:idNivel1, idUsuario:idUsuario1}});
-            //console.log('Hola');            
-            if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                res.status(200).send({
-                    message: 'Daily level stat updated succesfully',
-                });
-            }else{
-                res.status(404).send(
-                    {message: 'Daily level stat not found'}
-                );   
-            }  
+            if (typeof(req.body.puestoClasificacion) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid number of classification format'});
+            }
+            else if(req.body.puestoClasificacion < 0 || parseInt(req.body.puestoClasificacion) - req.body.puestoClasificacion != 0){
+                aux += 1;
+                res.status(422).send({message: 'Invalid number of classification value'});
+            }
+            if (typeof(req.body.estadoClasificacion1) != "boolean"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid state of classification 1% format'});
+            }
+            if (aux == 0){
+                const nivel = await dailyLevelStatsModel.update({nombreUsuario:data1.nombreUsuario,puestoClasificacion:data1.puestoClasificacion, estadoClasificacion1:data1.estadoClasificacion1},
+                    {where: {idNivel:idNivel1, idUsuario:idUsuario1}});
+                //console.log('Hola');            
+                if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
+                    res.status(200).send({
+                        message: 'Daily level stat updated succesfully',
+                    });
+                }else{
+                    res.status(404).send(
+                        {message: 'Daily level stat not found'}
+                    );   
+                }  
+            }
+            
         }catch (e) {
             res.status(500).send({error: e});
         }

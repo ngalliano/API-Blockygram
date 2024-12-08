@@ -7,10 +7,127 @@ class dailyLevelController{
 
     async create (req, res) {
         try{
-            const dailyLevel = await dailyLevelModel.create(req.body);
-        
-            if (dailyLevel)
-                res.status(201).send({message: 'Daily level created succesfully'});
+            let aux = 0;
+            let day = '';
+            function isValidIL(fecha){
+                //console.log(fecha);
+                if (fecha.toString().length == 7){
+                    day = fecha.toString().slice(0,-6);
+                }
+                else if(fecha.toString().length == 8){
+                    day = fecha.toString().slice(0,-5);
+                }
+                else{
+                    return false;
+                }
+                //console.log(day);
+                let month = fecha.toString().slice(-6,-4);
+                month = (parseInt(month)-1).toString();
+                //console.log(month);
+                const year = fecha.toString().slice(-4,-1) + fecha.toString().slice(-1);
+                //console.log(year);
+                const fecha2 = day + '-' + month + '-' + year;
+                //console.log(fecha2);
+                const fecha3 = new Date(fecha2);
+                //console.log(fecha3.getTime()); 
+                //console.log(isNaN(fecha3.getTime()));
+                if (isNaN(fecha3.getTime())){
+                    return false;
+                }
+                else{
+                    return true;
+                }    
+            }
+            function isValidTL(a){
+                return (a == 5 || a == 6 || a == 7);
+            }
+            function isValidLE(lista){
+                //console.log(lista);
+                for(let i=0; i<lista.length; i++){
+                    //console.log(lista[i] != "0"|| lista[i] != "1" || lista[i] != "2");
+                    if (lista[i] == "0" || lista[i] == "1" || lista[i] == "2"){
+                        
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                return true;
+            }
+            function isValidWE(listaaux){
+                const lista = listaaux.split(',');
+                for (let i=0; i<lista.length; i++){
+                    //console.log(lista[i]);
+                    if((parseFloat(lista[i]) - parseInt(lista[i]) != 0) || parseInt(lista[i]) < 0 || parseInt(lista[i]) > req.body.tipoNivel*(req.body.tipoNivel-1)*2){
+                        return false;
+                    }
+                }
+                return true;  
+            }
+            function isValidLPL(listaaux){
+                const lista1 = listaaux.split(',');
+                let lista2 = [];
+                let lista3 = [];
+                lista1.forEach(element => {
+                    lista2.push(element.split(':'));
+                });
+                //console.log(lista2);
+                //console.log(lista2.length);
+                for (let i=0; i<lista2.length; i++){
+                    //console.log(parseInt(lista2[i][0]));
+                    if(parseInt(lista2[i][0]) != lista2[i][2].length){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            //console.log(isValidIL(req.body.idNivel));
+            if (typeof(req.body.idNivel) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level id format'});
+            }
+            else if (!isValidIL(req.body.idNivel)){ 
+                aux += 1;
+                res.status(422).send({message: 'Invalid level id value'});
+            }
+            if (typeof(req.body.tipoNivel) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level type format'});
+            }
+            else if (!isValidTL(req.body.tipoNivel)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level type value'});
+            }
+            if (typeof(req.body.estructuraNivel) != "string"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level structure format'});
+            }
+            else if (req.body.estructuraNivel.length != Math.pow(req.body.tipoNivel,2) || !isValidLE(req.body.estructuraNivel)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level structure value'});
+            }
+            if (typeof(req.body.estructuraParedes) != "string"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid walls structure format'});
+            }
+            else if (!isValidWE(req.body.estructuraParedes)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid walls structure value'});
+            }
+            //console.log(req.body.listaPiezasNivel);
+            if (typeof(req.body.listaPiezasNivel) != "string"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level piece list format'});
+            }
+            else if (!isValidLPL(req.body.listaPiezasNivel)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level piece list value'});
+            }
+            if (aux == 0){
+                const dailyLevel = await dailyLevelModel.create(req.body);
+                if (dailyLevel)
+                    res.status(201).send({message: 'Daily level created succesfully'});
+            }
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -74,18 +191,99 @@ class dailyLevelController{
                     {message: 'Data in body and query of request is different'}
                 );
             }
-            const nivel = await dailyLevelModel.update({tipoNivel:data.tipoNivel,estructuraNivel:data.estructuraNivel,estructuraParedes:data.estructuraParedes,listaPiezasNivel:data.listaPiezasNivel},
-                {where: {idNivel:idNivel1}});
-            
-            if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                res.status(200).send({
-                    message: 'Daily level updated succesfully',
+            let aux = 0;
+            function isValidTL(a){
+                return (a == 5 || a == 6 || a == 7);
+            }
+            function isValidLE(lista){
+                //console.log(lista);
+                for(let i=0; i<lista.length; i++){
+                    //console.log(lista[i] != "0"|| lista[i] != "1" || lista[i] != "2");
+                    if (lista[i] == "0" || lista[i] == "1" || lista[i] == "2"){
+                        
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                return true;
+            }
+            function isValidWE(listaaux){
+                const lista = listaaux.split(',');
+                for (let i=0; i<lista.length; i++){
+                    //console.log(lista[i]);
+                    if((parseFloat(lista[i]) - parseInt(lista[i]) != 0) || parseInt(lista[i]) < 0 || parseInt(lista[i]) > req.body.tipoNivel*(req.body.tipoNivel-1)*2){
+                        return false;
+                    }
+                }
+                return true;  
+            }
+            function isValidLPL(listaaux){
+                const lista1 = listaaux.split(',');
+                let lista2 = [];
+                let lista3 = [];
+                lista1.forEach(element => {
+                    lista2.push(element.split(':'));
                 });
-            }else{
-                res.status(404).send(
-                    {message: 'Daily level not found'}
-                );   
-            }  
+                //console.log(lista2);
+                //console.log(lista2.length);
+                for (let i=0; i<lista2.length; i++){
+                    //console.log(parseInt(lista2[i][0]));
+                    if(parseInt(lista2[i][0]) != lista2[i][2].length){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            //console.log(isValidIL(req.body.idNivel));
+            if (typeof(req.body.tipoNivel) != "number"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level type format'});
+            }
+            else if (!isValidTL(req.body.tipoNivel)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level type value'});
+            }
+            console.log(aux);
+            if (typeof(req.body.estructuraNivel) != "string"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level structure format'});
+            }
+            else if (req.body.estructuraNivel.length != Math.pow(req.body.tipoNivel,2) || !isValidLE(req.body.estructuraNivel)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level structure value'});
+            }
+            if (typeof(req.body.estructuraParedes) != "string"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid walls structure format'});
+            }
+            else if (!isValidWE(req.body.estructuraParedes)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid walls structure value'});
+            }
+            //console.log(req.body.listaPiezasNivel);
+            if (typeof(req.body.listaPiezasNivel) != "string"){
+                aux += 1;
+                res.status(400).send({message: 'Invalid level piece list format'});
+            }
+            else if (!isValidLPL(req.body.listaPiezasNivel)){
+                aux += 1;
+                res.status(422).send({message: 'Invalid level piece list value'});
+            }
+            if (aux == 0){
+                const nivel = await dailyLevelModel.update({tipoNivel:data.tipoNivel,estructuraNivel:data.estructuraNivel,estructuraParedes:data.estructuraParedes,listaPiezasNivel:data.listaPiezasNivel},
+                    {where: {idNivel:idNivel1}});
+                
+                if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
+                    res.status(200).send({
+                        message: 'Daily level updated succesfully',
+                    });
+                }else{
+                    res.status(404).send(
+                        {message: 'Daily level not found'}
+                    );   
+                }  
+            }
         }catch (e) {
             res.status(500).send({error: e});
         }

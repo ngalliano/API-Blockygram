@@ -17,14 +17,13 @@ class playerController{
             return (a == "0" || a == "1" || a == "2" || a == "3" || a == "4" || a == "5" || a == "6" || a == "7" || a == "8" || a == "9");
         }
         function checkLevelGroupList (list){
-            console.log('HOLA');
+            
           
             for(let i = 7; i<7+9*groups+1; i=i+9){
-                console.log(list[i]);
-                console.log(list[i+1]);
+                
                 
                 if (isANum(list[i])){
-                    console.log('Buneas');
+                    
                 }
                 else{
                     return false;
@@ -39,7 +38,7 @@ class playerController{
                 if (!between(parseInt(list[i]))){
                     return false;
                 }
-                console.log("Daruis");
+                
                 
                 
             } 
@@ -75,19 +74,19 @@ class playerController{
                 console.log('CHAU X2');
                 if (typeof(req.body.cantidadPistas) != "number"){
                     aux += 1;
-                    res.status(400).send({message: 'Invalid number of tracks format'});
+                    res.status(400).send({message: 'Invalid number of clues format'});
                 }
                 else if(req.body.cantidadPistas != 5){
                     aux += 1;
-                    res.status(422).send({message: 'Invalid number of tracks value'});
+                    res.status(422).send({message: 'Invalid number of clues value'});
                 }
                 if (typeof(req.body.cantidadPistasAux) != "number"){
                     aux += 1;
-                    res.status(400).send({message: 'Invalid number of tracks aux format'});
+                    res.status(400).send({message: 'Invalid number of clues aux format'});
                 }
                 else if(req.body.cantidadPistasAux != 0){
                     aux += 1;
-                    res.status(422).send({message: 'Invalid number of tracks aux value'});
+                    res.status(422).send({message: 'Invalid number of clues aux value'});
                 }
                 if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
                     aux += 1;
@@ -189,14 +188,13 @@ class playerController{
             return (a == "0" || a == "1" || a == "2" || a == "3" || a == "4" || a == "5" || a == "6" || a == "7" || a == "8" || a == "9");
         }
         function checkLevelGroupList (list){
-            console.log('HOLA');
+            
           
             for(let i = 7; i<7+9*groups+1; i=i+9){
-                console.log(list[i]);
-                console.log(list[i+1]);
+                
                 
                 if (isANum(list[i])){
-                    console.log('Buneas');
+                    
                 }
                 else{
                     return false;
@@ -211,7 +209,7 @@ class playerController{
                 if (!between(parseInt(list[i]))){
                     return false;
                 }
-                console.log("Daruis");
+                
                 
                 
             } 
@@ -250,22 +248,21 @@ class playerController{
                 aux += 1;
                 res.status(422).send({message: 'Invalid daily levels completed value'});
             }
-            console.log('CHAU X2');
             if (typeof(req.body.cantidadPistas) != "number"){
                 aux += 1;
-                res.status(400).send({message: 'Invalid number of tracks format'});
+                res.status(400).send({message: 'Invalid number of clues format'});
             }
             else if (req.body.cantidadPistas < 0){
                 aux += 1;
-                res.status(422).send({message: 'Invalid number of tracks value'});
+                res.status(422).send({message: 'Invalid number of clues value'});
             }
             if (typeof(req.body.cantidadPistasAux) != "number"){
                 aux += 1;
-                res.status(400).send({message: 'Invalid number of tracks aux format'});
+                res.status(400).send({message: 'Invalid number of clues aux format'});
             }
             else if(req.body.cantidadPistasAux < 0){
                 aux += 1;
-                res.status(422).send({message: 'Invalid number of tracks aux value'});
+                res.status(422).send({message: 'Invalid number of clues aux value'});
             }
             if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
                 aux += 1;
