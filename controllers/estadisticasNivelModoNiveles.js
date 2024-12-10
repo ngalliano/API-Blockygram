@@ -1,6 +1,7 @@
 import { where } from 'sequelize';
 import levelModeLevelStatsModel from '../models/estadisticasNivelModoNiveles.js';
 import playerModel from '../models/Jugadores.js';
+import playerController from '../controllers/jugadores.js';
 
 class levelModeLevelStatController{
     constructor(){
@@ -10,6 +11,66 @@ class levelModeLevelStatController{
     async create (req, res) {
         try{
             let aux = 0;
+            let flag = false;
+            function actualizarPistas(pistas){
+                if (flag){
+                    flag = false;
+                    return (pistas + 1);
+                }
+                else{
+                    return pistas;
+                }
+            }
+            function actualizarPistasAux(pistasAux){
+                if (pistasAux + 1 == 5){
+                    flag = true;
+                    return 0;
+                }
+                else{
+                    return (pistasAux + 1);
+                }
+            }
+            function completarNivelesGrupo(listaAux){
+                console.log(listaAux.length);
+                let lista = '';
+                if (req.body.idNivel >= 1 && req.body.idNivel <= 10){
+                    lista = listaAux.slice(0,7) +(parseInt(listaAux[7])+1).toString() + listaAux.slice(8,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >= 11 && req.body.idNivel <= 20){
+                    lista = listaAux.slice(0,16) +(parseInt(listaAux[16])+1).toString() + listaAux.slice(17,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=21 && req.body.idNivel <= 30){
+                    lista = listaAux.slice(0,25) +(parseInt(listaAux[25])+1).toString() + listaAux.slice(26,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=31 && req.body.idNivel <= 40){
+                    lista = listaAux.slice(0,34) +(parseInt(listaAux[34])).toString() + listaAux.slice(35,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=41 && req.body.idNivel <= 50){
+                    lista = listaAux.slice(0,43) +(parseInt(listaAux[43])+1).toString() + listaAux.slice(44,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=51 && req.body.idNivel <= 60){
+                    lista = listaAux.slice(0,52) +(parseInt(listaAux[52])+1).toString() + listaAux.slice(53,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=61 && req.body.idNivel <= 70){
+                    lista = listaAux.slice(0,61) +(parseInt(listaAux[61])+1).toString() + listaAux.slice(62,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=71 && req.body.idNivel <= 80){
+                    lista = listaAux.slice(0,70) +(parseInt(listaAux[70])+1).toString() + listaAux.slice(71,listaAux.length); 
+                    console.log(lista);
+                }
+                else if (req.body.idNivel >=81 && req.body.idNivel <= 90){
+                    lista = listaAux.slice(0,79) +(parseInt(listaAux[79])+1).toString()
+                    console.log(lista);
+                }
+                return lista;
+            }
             if (typeof(req.body.idUsuario) != "string"){
                 aux += 1;
                 res.status(400).send({message: 'Invalid user id format'});
@@ -34,7 +95,43 @@ class levelModeLevelStatController{
                 const levelModeLevelStat = await levelModeLevelStatsModel.create(req.body);
                 console.log('HOLA');
                 if (levelModeLevelStat){
-                    res.status(201).send({message: 'Level stat created succesfully'});
+                    const player = await playerModel.findByPk(req.body.idUsuario);
+                        if (player){
+                            //console.log(player.listaCantidadNivelesCompletadosGrupo);
+                            const pistasAuxActualizadas = actualizarPistasAux(player.cantidadPistasAux);
+                            const pistasActualizadas = actualizarPistas(player.cantidadPistas);
+                            const nivelesActualizados = completarNivelesGrupo(player.listaCantidadNivelesCompletadosGrupo);
+                            
+                            const req2 ={
+                                params:{
+                                    idUsuario: req.body.idUsuario
+                                },
+                                body:{
+                                    idUsuario: player.idUsuario,
+                                    nombreUsuario: player.nombreUsuario,
+                                    listaCantidadNivelesCompletadosGrupo: nivelesActualizados,
+                                    cantidadNivelesDiariosCompletados: player.cantidadNivelesDiariosCompletados,
+                                    cantidadPistas: pistasActualizadas,
+                                    cantidadPistasAux: pistasAuxActualizadas,
+                                    mejorTiempoNivelDiario: player.mejorTiempoNivelDiario,
+                                    mejorPuestoClasificacionEnPorcentaje: player.mejorPuestoClasificacionEnPorcentaje,
+                                    cantidadVecesClasificacion1: player.cantidadVecesClasificacion1, 
+                                }
+                            };
+                            const res2 = {
+                                status(code){
+                                    this.statusCode = code;
+                                    return this;
+                                },
+                                send(data){
+                                    this.dataResult = data;
+                                    return this;
+                                }
+                            };
+                            playerController.update(req2, res2);
+                            console.log(res2);
+                            res.status(201).send({message: 'Level stat created succesfully'});
+                        }
                 }
             }
         }catch (e) {

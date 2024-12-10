@@ -15,7 +15,7 @@ class dailyLevelController{
                     day = fecha.toString().slice(0,-6);
                 }
                 else if(fecha.toString().length == 8){
-                    day = fecha.toString().slice(0,-5);
+                    day = fecha.toString().slice(0,2);
                 }
                 else{
                     return false;
@@ -26,10 +26,10 @@ class dailyLevelController{
                 //console.log(month);
                 const year = fecha.toString().slice(-4,-1) + fecha.toString().slice(-1);
                 //console.log(year);
-                const fecha2 = day + '-' + month + '-' + year;
-                //console.log(fecha2);
+                const fecha2 = month + '/' + day + '/' + year;
+                console.log(fecha2);
                 const fecha3 = new Date(fecha2);
-                //console.log(fecha3.getTime()); 
+                console.log(fecha3.getTime()); 
                 //console.log(isNaN(fecha3.getTime()));
                 if (isNaN(fecha3.getTime())){
                     return false;

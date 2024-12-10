@@ -1,11 +1,13 @@
+import { Sequelize, where } from 'sequelize';
 import dailyLevelStatsModel from '../models/estadisticasNivelDiario.js';
 import playerModel from '../models/Jugadores.js';
+import dailyLevelModel from '../models/nivelesDiarios.js';
 
 class playerController{
     constructor(){
-
-    }
     
+    }
+        
     async create (req, res) {
         const min = 0;
         const max = 10;
@@ -137,36 +139,13 @@ class playerController{
 
     async getOne (req, res) {
         try{
+            
             const { idUsuario } = req.params;
             const player = await playerModel.findByPk(idUsuario);
             
             if(player) {
-                /*const listaNivelesDiarios = await dailyLevelStatsModel.findAll({
-                    where: {idUsuario: player.idUsuario},
-                    atributes: ['tiempoResolucion', 'estadoClasificacion1', 'puestoClasificacion'],
-                    order: [['tiempoResolucion', 'ASC']]
-                });
-                
-                let cantidadClasificaciones = 0;
-                listaNivelesDiarios.forEach(stat => {
-                    if (stat.estadoClasificacion1 == true){
-                        cantidadClasificaciones += 1;
-                    }
-                });
-                
-                const player2 = player.map((jugador) => ({
-                    idUsuario: jugador.idUsuario,
-                    nombreUsuario: jugador.nombreUsuario,
-                    listaCantidadNivelesCompletadosGrupo: jugador.listaCantidadNivelesCompletadosGrupo,
-                    cantidadNivelesDiariosCompletados: listaNivelesDiarios.length,
-                    cantidadPistas : jugador.cantidadPistas,
-                    mejorTiempoNivelDiario: listaNivelesDiarios[0].tiempoResolucion,
-                    cantidadVecesClasificacion1: cantidadClasificaciones,
-                    mejorPuestoClasificacionEnPorcentaje: jugador.mejorPuestoClasificacionEnPorcentaje,
-                }))
-                */
-                 
                 res.status(200).send(player);
+                console.log(res);
             }else{
                 res.status(404).send(
                     {message: 'Player not found'}
@@ -236,7 +215,7 @@ class playerController{
                 aux += 1;
                 res.status(400).send({message: 'Invalid user name format'});
             }
-            else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo.toString())){
+            else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo)){
                 aux += 1;
                 res.status(422).send({message: 'At least one of completed levels by group is invalid'})
             }
@@ -329,6 +308,7 @@ class playerController{
             res.status(500).send({error: e});
         }
     }
+    
 }
 
 export default new playerController();
