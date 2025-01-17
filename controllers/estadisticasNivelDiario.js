@@ -1,17 +1,18 @@
-import { and, DATE, where } from 'sequelize';
+import { and, Association, DATE, Op, where } from 'sequelize';
 import dailyLevelStatsModel from '../models/estadisticasNivelDiario.js';
 import playerController from '../controllers/jugadores.js'
 import fastifyMysql from '@fastify/mysql';
 import playerModel from '../models/Jugadores.js';
 import fastify from 'fastify';
+import jugadores from '../controllers/jugadores.js';
 
 class dailyLevelStatController{
     constructor(){
 
     }
-
+    
     async create (req, res) {
-        try{
+        function fechaActual(){
             const fecha1 = new Date();
             const opciones = {
                 timeZone: 'America/Argentina/Buenos_Aires',
@@ -24,23 +25,26 @@ class dailyLevelStatController{
             };
             const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
             const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
-            function mejorTiempo(tiempo){
-                if (req.body.tiempoResolucion < tiempo){
-                    return req.body.tiempoResolucion;
-                }
-                else{
-                    return tiempo;
-                }
+            return fecha2;
+        }
+        function mejorTiempo(tiempo){
+            if (req.body.tiempoResolucion < tiempo){
+                return req.body.tiempoResolucion;
             }
-            function actualizarContador(cantidad){
-                return (cantidad + 1);
+            else{
+                return tiempo;
             }
-            function actualizarEstadoClasificacion(puesto,cantidadpuestos){
-                return (puesto/cantidadpuestos < 1/100);
-            }
-            //console.log(req);
+        }
+        function actualizarContador(cantidad){
+            return (cantidad + 1);
+        }
+        function actualizarEstadoClasificacion(puesto,cantidadpuestos){
+            return (puesto/cantidadpuestos < 1/100);
+        }
+        try{
+            const fecha = fechaActual();
             let aux = 0;
-            if (req.body.idNivel != parseInt(fecha2)){
+            if (req.body.idNivel != parseInt(fecha)){
                 aux +=1;
                 res.status(500).send({message: 'Invalid action'});
             }
@@ -56,7 +60,7 @@ class dailyLevelStatController{
                 aux += 1;
                 res.status(400).send({message: 'Invalid number of classification format'});
             }
-            else if(req.body.puestoClasificacion < 0 || parseInt(req.body.puestoClasificacion) - req.body.puestoClasificacion != 0 || req.body.puestoClasificacion != 100){
+            else if(req.body.puestoClasificacion < 0 || parseInt(req.body.puestoClasificacion) - req.body.puestoClasificacion != 0){
                 aux += 1;
                 res.status(422).send({message: 'Invalid number of classification value'});
             }
@@ -77,15 +81,12 @@ class dailyLevelStatController{
                     if (dailyLevelStat){
                         const player = await playerModel.findByPk(req.body.idUsuario);
                         if (player){
-                            console.log(player.listaCantidadNivelesCompletadosGrupo);
                             const tiempoActualizado = mejorTiempo(player.mejorTiempoNivelDiario);
                             const nivelesDiariosActualizados = actualizarContador(player.cantidadNivelesDiariosCompletados);
                             const lista1 = await dailyLevelStatsModel.findAll({
-                                where: {idNivel:parseInt(fecha2)},
+                                where: {idNivel:parseInt(fecha)},
                                 order: [['tiempoResolucion', 'ASC']]
                             });
-                            let index = 0;
-                            console.log('RYZE');
                             const leaderBoard1 = lista1.map((user, index) => ({
                                 idUsuario: user.idUsuario,
                                 idNivel: user.idNivel,
@@ -94,7 +95,6 @@ class dailyLevelStatController{
                                 puestoClasificacion: index + 1,
                                 estadoClasificacion1: user.estadoClasificacion1
                             }));
-                            console.log(leaderBoard1.length);
                             const leaderBoard2 = leaderBoard1.map((user) => ({
                                 idUsuario: user.idUsuario,
                                 idNivel: user.idNivel,
@@ -103,38 +103,10 @@ class dailyLevelStatController{
                                 puestoClasificacion: user.puestoClasificacion,
                                 estadoClasificacion1: actualizarEstadoClasificacion(user.puestoClasificacion,leaderBoard1.length)
                             }));
-                            console.log(leaderBoard2[0]);
                             leaderBoard2.forEach(element => {
-                                let req4 ={
-                                    params:{
-                                        idNivel: element.idNivel,
-                                        idUsuario: element.idUsuario
-                                    },
-                                    body:{
-                                        idUsuario: element.idUsuario,
-                                        idNivel: element.idNivel,
-                                        nombreUsuario: element.nombreUsuario,
-                                        tiempoResolucion: element.tiempoResolucion,
-                                        puestoClasificacion: element.puestoClasificacion,
-                                        estadoClasificacion1: element.estadoClasificacion1
-                                    }
-                                }
-                                let res4={
-                                    status(code){
-                                        this.statusCode = code;
-                                        return this;
-                                    },
-                                    send(data){
-                                        this.dataResult = data;
-                                        return this; 
-                                    }
-                                }
-                                //console.log(req4);
-                                //console.log(res4);
                                 dailyLevelStatsModel.update({nombreUsuario:element.nombreUsuario, puestoClasificacion:element.puestoClasificacion, estadoClasificacion1:element.estadoClasificacion1}
                                     ,{where: {idNivel:element.idNivel, idUsuario:element.idUsuario}});
                             });
-                            
                             const req2 ={
                                 params:{
                                     idUsuario: req.body.idUsuario,
@@ -162,9 +134,7 @@ class dailyLevelStatController{
                                 }
                             };
                             playerController.update(req2, res2);
-                            console.log(res2);
                             res.status(201).send({message: 'Daily level stat created succesfully'});
-                            
                         }
                     }
                 }
@@ -172,7 +142,6 @@ class dailyLevelStatController{
                     res.status(500).send({message: 'Daily Level Stat already exist'});
                 }
             }
-            console.log(req.body);
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -189,7 +158,7 @@ class dailyLevelStatController{
     }
 
     async getTop20 (req, res){
-        try{
+        function fechaActual() {
             const fecha1 = new Date();
             const opciones = {
                 timeZone: 'America/Argentina/Buenos_Aires',
@@ -202,22 +171,29 @@ class dailyLevelStatController{
             };
             const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
             const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
-            const index = 0
-            console.log(fecha2);
-            const lista = await dailyLevelStatsModel.findAll({
-                attributes: ['puestoClasificacion','nombreUsuario','tiempoResolucion'],
-                where: {idNivel:parseInt(fecha2)},
+            return fecha2; 
+        }
+        class Registro{
+            constructor (nombreUsuario, puestoClasificacion, tiempoResolucion){
+                this.nombreUsuario = nombreUsuario;
+                this.puestoClasificacion = puestoClasificacion;
+                this.tiempoResolucion = tiempoResolucion;
+            }
+        }
+        try{
+            const fecha = fechaActual();
+            const leaderBoard = [];
+            const lista1 = await dailyLevelStatsModel.findAll({
+                attributes: ['puestoClasificacion','idUsuario','tiempoResolucion'],
+                where: {idNivel:parseInt(fecha)},
                 limit: 20,
-                order: [['tiempoResolucion', 'ASC']]
+                order: [['puestoClasificacion', 'ASC']]
             });
-            const leaderBoard = lista.map((user, index) => ({
-                nombreUsuario: user.nombreUsuario,
-                puestoClasificacion: index + 1,
-                tiempoResolucion: user.tiempoResolucion
-            }));
-    
-            //console.log("hola");
-  
+            const lista2 = await playerModel.findAll();
+            lista1.forEach(element => {
+                const player = lista2.find((element1) => element1.idUsuario === element.idUsuario)
+                leaderBoard.push(new Registro (player.nombreUsuario, element.puestoClasificacion, element.tiempoResolucion));
+            });
             res.status(200).send(leaderBoard);
         }catch (e){
             res.status(500).send({error: e}); 
@@ -225,8 +201,14 @@ class dailyLevelStatController{
     }
     
     async getPlayerPositionGroup (req, res) {
-        try {
-            const idUsuario1 = req.query.idUsuario;
+        class Registro{
+            constructor (nombreUsuario, puestoClasificacion, tiempoResolucion){
+                this.nombreUsuario = nombreUsuario;
+                this.puestoClasificacion = puestoClasificacion;
+                this.tiempoResolucion = tiempoResolucion;
+            }
+        }
+        function fechaActual(){
             const fecha1 = new Date();
             const opciones = {
                 timeZone: 'America/Argentina/Buenos_Aires',
@@ -239,48 +221,28 @@ class dailyLevelStatController{
             };
             const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
             const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
-            const index = 0;
-                       
-            console.log("hola");
-            //console.log(nivel);
+            return fecha2;
+        }
+        try {
+            const fecha = fechaActual()      
             const lista1 = await dailyLevelStatsModel.findAll({
-                attributes: ['puestoClasificacion','idUsuario','nombreUsuario','tiempoResolucion'],
-                where: {idNivel:parseInt(fecha2)},
-                order: [['tiempoResolucion', 'ASC']]
+                attributes: ['puestoClasificacion','idUsuario','tiempoResolucion'],
+                where: {idNivel:parseInt(fecha)},
+                order: [['puestoClasificacion', 'ASC']]
             });
-            
-            const lista2 = lista1.map((user, index) => ({
-                idUsuario: user.idUsuario,
-                nombreUsuario: user.nombreUsuario,
-                puestoClasificacion: index + 1,
-                tiempoResolucion: user.tiempoResolucion
-            }));
-            
-            class Registro{
-                constructor (nombreUsuario, puestoClasificacion, tiempoResolucion){
-                    this.nombreUsuario = nombreUsuario;
-                    this.puestoClasificacion = puestoClasificacion;
-                    this.tiempoResolucion = tiempoResolucion;
-                }
-            }
-            
-            const lista3 = [];
-            lista2.forEach(element => {
-                lista3.push(new Registro (element.nombreUsuario, element.puestoClasificacion, element.tiempoResolucion));
-            });
-            //console.log(lista2[0].idUsuario);
-            const player = lista2.find((element) => element.idUsuario === idUsuario1)
+            const lista2 = await playerModel.findAll();
+            const player = lista1.find((element) => element.idUsuario === req.query.idUsuario)
             if (player == undefined){
                 res.status(404).send(
                     {message: 'Daily level stat for player not found'}
                 );   
             }
-            console.log("hola");
-            
+            const lista3 = [];
+            lista1.forEach(element => {
+                const player = lista2.find((element1) => element1.idUsuario === element.idUsuario)
+                lista3.push(new Registro (player.nombreUsuario, element.puestoClasificacion, element.tiempoResolucion));
+            });
             const leaderBoard = [];
-            console.log(lista2.length);            
-            console.log(lista3.length);
-            console.log(player.puestoClasificacion);
             if (lista3.length > 20){
                 if (player.puestoClasificacion < 11){
                     for (let i=0; i < player.puestoClasificacion; i++){
@@ -298,7 +260,6 @@ class dailyLevelStatController{
                         console.log(j);
                         console.log(i);
                     }
-                    console.log("AAA");
                     for (let i=player.puestoClasificacion; i<player.puestoClasificacion+10; i++){
                         leaderBoard[j] = lista3[i];
                         j++;
@@ -317,11 +278,9 @@ class dailyLevelStatController{
                 for (let i = 0; i<lista3.length; i++){
                     leaderBoard[i] = lista3[i];
                 }
+                console.log(leaderBoard);
             }
-                        
-            console.log("hola");            
             res.status(200).send(leaderBoard);
-            
         } catch (e) {
             res.status(500).send({error: e});    
         }

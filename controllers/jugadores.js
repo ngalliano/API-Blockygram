@@ -7,7 +7,7 @@ class playerController{
     constructor(){
     
     }
-        
+    
     async create (req, res) {
         const min = 0;
         const max = 10;
@@ -288,6 +288,98 @@ class playerController{
         }
     }
 
+    async finalDailyUpdate (req, res){
+        function fechaActual(){
+            const fecha1 = new Date();
+            const opciones = {
+                timeZone: 'America/Argentina/Buenos_Aires',
+                year: 'numeric',
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit'
+            };
+            const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
+            const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
+            return fecha2;
+        }
+        function mejorPuesto(anteriorPuestoPorcentaje, nuevoPuesto, cantidad){
+            const nuevopuestoPorcentaje = parseFloat(nuevoPuesto)/parseFloat(cantidad) 
+            if (anteriorPuestoPorcentaje < nuevopuestoPorcentaje){
+                return anteriorPuestoPorcentaje;
+            }
+            else{
+                return nuevopuestoPorcentaje;
+            }
+        }
+        function actualizarClasificacion1(cantidadClasificaciones,estadoClasificacion1){
+            if (estadoClasificacion1){
+                return cantidadClasificaciones + 1;
+            }
+            else {
+                return cantidadClasificaciones;
+            }
+        }
+        function diaAnterior(){
+            const fecha = fechaActual();
+            //console.log(fecha);
+            let hoy = fecha.slice(4,8) + '-' + fecha.slice(2,4) + '-' + fecha.slice(0,2);
+            hoy = new Date(hoy)
+            const ayer = hoy;
+            ayer.setDate(hoy.getDate());
+            const opciones = {
+                timeZone: 'America/Argentina/Buenos_Aires',
+                year: 'numeric',
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit'
+            };
+            const ayerArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(hoy);
+            const fechaAyer = ayerArgentina.toString().slice(0,2) + ayerArgentina.toString().slice(3,5) + ayerArgentina.toString().slice(6,10)
+            //console.log(fechaAyer);
+            return fechaAyer;
+        }
+        async function updateAll(){
+            const fechaAnterior = diaAnterior();
+            const players = await playerModel.findAll();
+            const stats = await dailyLevelStatsModel.findAll({where: {idNivel: parseInt(fechaAnterior)}});
+            stats.forEach(element => {
+                const player = players.find((element1) => element1.idUsuario == element.idUsuario);
+                const updatedPlayer = {
+                    idUsuario: player.idUsuario,
+                    nombreUsuario: player.nombreUsuario,
+                    listaCantidadNivelesCompletadosGrupo: player.listaCantidadNivelesCompletadosGrupo,
+                    cantidadNivelesDiariosCompletados: player.cantidadNivelesDiariosCompletados,
+                    cantidadPistas: player.cantidadPistas,
+                    cantidadPistasAux: player.cantidadPistasAux,
+                    mejorTiempoNivelDiario: player.mejorTiempoNivelDiario,
+                    mejorPuestoClasificacionEnPorcentaje: mejorPuesto(player.mejorPuestoClasificacionEnPorcentaje, element.puestoClasificacion, stats.length),
+                    cantidadVecesClasificacion1: actualizarClasificacion1(player.cantidadVecesClasificacion1,element.estadoClasificacion1),
+                };
+                const playerUpdate = playerModel.update({nombreUsuario:updatedPlayer.nombreUsuario,listaCantidadNivelesCompletadosGrupo:updatedPlayer.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:updatedPlayer.cantidadNivelesDiariosCompletados,cantidadPistas:updatedPlayer.cantidadPistas,cantidadPistasAux:updatedPlayer.cantidadPistasAux,mejorTiempoNivelDiario:updatedPlayer.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:updatedPlayer.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:updatedPlayer.cantidadVecesClasificacion1},
+                    {where: {idUsuario:updatedPlayer.idUsuario}});
+                if (typeof (playerUpdate[0]) != 'undefined' && playerUpdate[0] === 1){
+                    
+                }else{
+                    return 500;  
+                }  
+            });
+            return 200;
+        }
+        try {
+            const update = await updateAll();
+            console.log(update);
+            if (update == 200){
+                res.status(200).send({message:'Final Daily Update Successfully Completed'});
+            }
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
     async delete (req, res) {
         try{
             const { idUsuario } = req.params;
@@ -309,6 +401,8 @@ class playerController{
         }
     }
     
+    
+
 }
 
 export default new playerController();

@@ -4,10 +4,6 @@ import playerModel from './Jugadores.js';
 import dailyLevelModel from './nivelesDiarios.js';
 
 const dailyLevelStatsModel = db.define('estadisticasNivelDiario', {
-    nombreUsuario: {
-        type: sequilize.STRING,
-        allowNull: false,
-    },
     tiempoResolucion: {
         type: sequilize.FLOAT,
         allowNull: false,

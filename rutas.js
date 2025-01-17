@@ -17,6 +17,11 @@ const rutas = [
         handler: playerController.getAll, 
     },
     {
+        method: "PUT",
+        url: "/jugadores/actualizacion",
+        handler: playerController.finalDailyUpdate, 
+    },
+    {
         method: "GET",
         url: "/jugadores/:idUsuario",
         handler: playerController.getOne, 

@@ -9,22 +9,26 @@ class dailyLevelController{
         try{
             let aux = 0;
             let day = '';
+            let month = '';
+            let year = '';
             function isValidIL(fecha){
                 //console.log(fecha);
                 if (fecha.toString().length == 7){
-                    day = fecha.toString().slice(0,-6);
+                    day = fecha.toString()[0];
+                    month = fecha.toString().slice(1,3);
+                    year = fecha.toString().slice(3);
                 }
                 else if(fecha.toString().length == 8){
                     day = fecha.toString().slice(0,2);
+                    month = fecha.toString().slice(2,4);
+                    year = fecha.toString().slice(4);
                 }
                 else{
                     return false;
                 }
                 //console.log(day);
-                let month = fecha.toString().slice(-6,-4);
-                month = (parseInt(month)-1).toString();
+                month = (parseInt(month)).toString();
                 //console.log(month);
-                const year = fecha.toString().slice(-4,-1) + fecha.toString().slice(-1);
                 //console.log(year);
                 const fecha2 = month + '/' + day + '/' + year;
                 console.log(fecha2);
