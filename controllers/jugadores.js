@@ -5,37 +5,7 @@ import dailyLevelModel from '../models/nivelesDiarios.js';
 
 class playerController{
     constructor(){
-       this.timerMidnight(); 
-    }
     
-    async timerMidnight(){
-        function timeToMidnight(){
-            const fecha1 = new Date();
-            const opciones = {
-                timeZone: 'America/Argentina/Buenos_Aires',
-                year: 'numeric',
-                month: '2-digit', 
-                day: '2-digit', 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit'
-            };
-            const fechaArgentina = new Intl.DateTimeFormat('en-US', opciones).format(fecha1);
-            const fechaHoy = new Date(fechaArgentina);
-            console.log(fechaHoy);
-            const fecha2 = new Date(fechaHoy);
-            fecha2.setDate(fechaHoy.getDate()+1);
-            fecha2.setHours(0,0,0,0);
-            console.log(fecha2);
-            if (fecha2-fechaHoy < 0){
-                return 0;
-            }
-            else{
-                return 0;
-            }
-        }
-        setTimeout(this.finalDailyUpdate, timeToMidnight());
-        setInterval(this.finalDailyUpdate, 24*60*60*1000);
     }
     
     async create (req, res) {
@@ -331,7 +301,6 @@ class playerController{
                 second: '2-digit'
             };
             const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
-            console.log(fechaArgentina);
             const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
             return fecha2;
         }
@@ -353,14 +322,12 @@ class playerController{
             }
         }
         function diaAnterior(){
-            // ARREGLAR ERROR EN FECHA NO USAR SLICE SINO TOLOCALESTRING
             const fecha = fechaActual();
-            console.log(fecha);
+            //console.log(fecha);
             let hoy = fecha.slice(4,8) + '-' + fecha.slice(2,4) + '-' + fecha.slice(0,2);
-            const diaHoy = new Date(hoy)
-            const ayer = diaHoy;
-            console.log(diaHoy.getDate());
-            ayer.setDate(diaHoy.getDate());
+            hoy = new Date(hoy)
+            const ayer = hoy;
+            ayer.setDate(hoy.getDate());
             const opciones = {
                 timeZone: 'America/Argentina/Buenos_Aires',
                 year: 'numeric',
@@ -370,24 +337,13 @@ class playerController{
                 minute: '2-digit', 
                 second: '2-digit'
             };
-            const ayerArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(diaHoy);
+            const ayerArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(hoy);
             const fechaAyer = ayerArgentina.toString().slice(0,2) + ayerArgentina.toString().slice(3,5) + ayerArgentina.toString().slice(6,10)
-            console.log(ayerArgentina);
-            console.log(fechaAyer);
+            //console.log(fechaAyer);
             return fechaAyer;
         }
         async function updateAll(){
             const fechaAnterior = diaAnterior();
-            const res = {
-                status(code){
-                    this.statusCode = code;
-                    return this;
-                },
-                send(data){
-                    this.dataResult = data;
-                    return this;
-                }
-            };
             const players = await playerModel.findAll();
             const stats = await dailyLevelStatsModel.findAll({where: {idNivel: parseInt(fechaAnterior)}});
             stats.forEach(element => {
@@ -408,17 +364,15 @@ class playerController{
                 if (typeof (playerUpdate[0]) != 'undefined' && playerUpdate[0] === 1){
                     
                 }else{
-                    res.status(500);
-                    return res;  
+                    return 500;  
                 }  
             });
-            res.status(200);
-            return res;
+            return 200;
         }
         try {
             const update = await updateAll();
             console.log(update);
-            if (update.status() == 200){
+            if (update == 200){
                 res.status(200).send({message:'Final Daily Update Successfully Completed'});
             }
         } catch (error) {
@@ -447,6 +401,8 @@ class playerController{
         }
     }
     
+    
+
 }
 
 export default new playerController();
