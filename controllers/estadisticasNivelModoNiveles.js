@@ -115,7 +115,8 @@ class levelModeLevelStatController{
                                     cantidadPistasAux: pistasAuxActualizadas,
                                     mejorTiempoNivelDiario: player.mejorTiempoNivelDiario,
                                     mejorPuestoClasificacionEnPorcentaje: player.mejorPuestoClasificacionEnPorcentaje,
-                                    cantidadVecesClasificacion1: player.cantidadVecesClasificacion1, 
+                                    cantidadVecesClasificacion1: player.cantidadVecesClasificacion1,
+                                    opciones: player.opciones  
                                 }
                             };
                             const res2 = {

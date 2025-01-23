@@ -120,7 +120,8 @@ class dailyLevelStatController{
                                     cantidadPistasAux: player.cantidadPistasAux,
                                     mejorTiempoNivelDiario: tiempoActualizado,
                                     mejorPuestoClasificacionEnPorcentaje: player.mejorPuestoClasificacionEnPorcentaje,
-                                    cantidadVecesClasificacion1: player.cantidadVecesClasificacion1, 
+                                    cantidadVecesClasificacion1: player.cantidadVecesClasificacion1,
+                                    opciones: player.opciones 
                                 }
                             };
                             const res2 = {
