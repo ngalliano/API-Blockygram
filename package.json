@@ -16,7 +16,7 @@
     "sequelize": "^6.37.3"
   },
   "devDependencies": {
-    "eslint": "^9.18.0",
+    "eslint": "^9.19.0",
     "globals": "^15.14.0"
   }
 }

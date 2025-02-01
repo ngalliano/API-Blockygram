@@ -30,7 +30,7 @@
           meta: {
             type: "suggestion",
             docs: {
-              description: "Limita la longitud de los nombres de las variables a un máximo de 15 caracteres",
+              description: "Limita la longitud de los nombres de las variables a un máximo de 20 caracteres",
               recommended: false, 
             },
             schema: [

@@ -1,6 +1,6 @@
 import { where } from 'sequelize';
-import levelModeLevelStatsModel from '../models/estadisticasNivelModoNiveles.js';
-import playerModel from '../models/Jugadores.js';
+import levelModeStatsModel from '../models/estadisticasNivelModoNiveles.js';
+import playerModel from '../models/jugadores.js';
 import playerController from '../controllers/jugadores.js';
 
 class levelModeLevelStatController{
@@ -46,7 +46,7 @@ class levelModeLevelStatController{
                     console.log(lista);
                 }
                 else if (req.body.idNivel >=31 && req.body.idNivel <= 40){
-                    lista = listaAux.slice(0,34) +(parseInt(listaAux[34])).toString() + listaAux.slice(35,listaAux.length); 
+                    lista = listaAux.slice(0,34) +(parseInt(listaAux[34])+1).toString() + listaAux.slice(35,listaAux.length); 
                     console.log(lista);
                 }
                 else if (req.body.idNivel >=41 && req.body.idNivel <= 50){
@@ -71,9 +71,14 @@ class levelModeLevelStatController{
                 }
                 return lista;
             }
+            const player = await playerModel.findByPk(req.body.idUsuario);
             if (typeof(req.body.idUsuario) != "string"){
                 aux += 1;
                 res.status(400).send({message: 'Invalid user id format'});
+            }
+            else if (!player){
+                aux += 1;
+                res.status(422).send({message: 'Invalid user id value'});
             }
             if (typeof(req.body.idNivel) != "number"){
                 aux += 1;
@@ -92,47 +97,43 @@ class levelModeLevelStatController{
                 res.status(422).send({message: 'Invalid best level time value'});
             }
             if (aux == 0){
-                const levelModeLevelStat = await levelModeLevelStatsModel.create(req.body);
-                console.log('HOLA');
+                const levelModeLevelStat = await levelModeStatsModel.create(req.body);
+                
                 if (levelModeLevelStat){
-                    const player = await playerModel.findByPk(req.body.idUsuario);
-                        if (player){
-                            //console.log(player.listaCantidadNivelesCompletadosGrupo);
-                            const pistasAuxActualizadas = actualizarPistasAux(player.cantidadPistasAux);
-                            const pistasActualizadas = actualizarPistas(player.cantidadPistas);
-                            const nivelesActualizados = completarNivelesGrupo(player.listaCantidadNivelesCompletadosGrupo);
-                            
-                            const req2 ={
-                                params:{
-                                    idUsuario: req.body.idUsuario
-                                },
-                                body:{
-                                    idUsuario: player.idUsuario,
-                                    nombreUsuario: player.nombreUsuario,
-                                    listaCantidadNivelesCompletadosGrupo: nivelesActualizados,
-                                    cantidadNivelesDiariosCompletados: player.cantidadNivelesDiariosCompletados,
-                                    cantidadPistas: pistasActualizadas,
-                                    cantidadPistasAux: pistasAuxActualizadas,
-                                    mejorTiempoNivelDiario: player.mejorTiempoNivelDiario,
-                                    mejorPuestoClasificacionEnPorcentaje: player.mejorPuestoClasificacionEnPorcentaje,
-                                    cantidadVecesClasificacion1: player.cantidadVecesClasificacion1,
-                                    opciones: player.opciones  
-                                }
-                            };
-                            const res2 = {
-                                status(code){
-                                    this.statusCode = code;
-                                    return this;
-                                },
-                                send(data){
-                                    this.dataResult = data;
-                                    return this;
-                                }
-                            };
-                            playerController.update(req2, res2);
-                            console.log(res2);
-                            res.status(201).send({message: 'Level stat created succesfully'});
+                    const pistasAuxActuales = actualizarPistasAux(player.cantidadPistasAux);
+                    const pistasActualizadas = actualizarPistas(player.cantidadPistas);
+                    const nivelesActualizados = completarNivelesGrupo(player.listaCantidadNivelesCompletadosGrupo);
+                    
+                    const req2 ={
+                        params:{
+                            idUsuario: player.idUsuario
+                        },
+                        body:{
+                            idUsuario: player.idUsuario,
+                            nombreUsuario: player.nombreUsuario,
+                            listaCantidadNivelesCompletadosGrupo: nivelesActualizados,
+                            cantidadNivelesDiariosCompletados: player.cantidadNivelesDiariosCompletados,
+                            cantidadPistas: pistasActualizadas,
+                            cantidadPistasAux: pistasAuxActuales,
+                            mejorTiempoNivelDiario: player.mejorTiempoNivelDiario,
+                            mejorPuestoClasificacionEnPorcentaje: player.mejorPuestoClasificacionEnPorcentaje,
+                            cantidadVecesClasificacion1: player.cantidadVecesClasificacion1,
+                            opciones: player.opciones  
                         }
+                    };
+                    const res2 = {
+                        status(code){
+                            this.statusCode = code;
+                            return this;
+                        },
+                        send(data){
+                            this.dataResult = data;
+                            return this;
+                        }
+                    };
+                    await playerController.update(req2, res2);
+                    res.status(201).send({message: 'Level stat created succesfully'});
+                        
                 }
             }
         }catch (e) {
@@ -143,7 +144,7 @@ class levelModeLevelStatController{
     async getAll (req, res) {
         try{
             const where = {...req.query};
-            const lista = await levelModeLevelStatsModel.findAll({where});
+            const lista = await levelModeStatsModel.findAll({where});
             res.status(200).send(lista);    
         }catch (e) {
             res.status(500).send({error: e});
@@ -155,7 +156,7 @@ class levelModeLevelStatController{
             const idNivel1 = req.query.idNivel;
             const idUsuario1 = req.query.idUsuario;
             
-            const nivel = await levelModeLevelStatsModel.findOne({
+            const nivel = await levelModeStatsModel.findOne({
                 where: {idUsuario:idUsuario1, idNivel: idNivel1}
             });
             
@@ -177,15 +178,17 @@ class levelModeLevelStatController{
             const idNivel1 = req.query.idNivel;
             const idUsuario1 = req.query.idUsuario;
             let aux = 0;
-            //console.log(idNivel1);
-            const stat = await levelModeLevelStatsModel.findOne({
+            console.log(idNivel1);
+            const stat = await levelModeStatsModel.findOne({
                 where: {idUsuario: idUsuario1, idNivel: idNivel1}
             });
-            console.log(stat.dataValues.mejorTiempoResolucion);
+            if (!stat){
+                aux +=1;
+                res.status(404).send({message: 'Level stat not found'});  
+            }
             if (data1.idUsuario != idUsuario1 || data1.idNivel != idNivel1){
-                res.status(400).send(
-                    {message: 'Data in body and query of request is different'}
-                );
+                aux += 1;
+                res.status(400).send({message: 'Data in body and query of request is different'});
             }
             if (typeof(req.body.mejorTiempoResolucion) != "number"){
                 aux += 1;
@@ -198,17 +201,13 @@ class levelModeLevelStatController{
             
             if (aux == 0)
             {
-                const nivel = await levelModeLevelStatsModel.update({mejorTiempoResolucion:data1.mejorTiempoResolucion},
+                const nivel = await levelModeStatsModel.update({mejorTiempoResolucion:data1.mejorTiempoResolucion},
                     {where: {idNivel:idNivel1, idUsuario:idUsuario1}});
                 //console.log('Hola');            
                 if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                    res.status(200).send({
-                        message: 'Level stat updated succesfully',
-                    });
+                    res.status(200).send({message: 'Level stat updated succesfully'});
                 }else{
-                    res.status(404).send(
-                        {message: 'Level stat not found'}
-                    );   
+                    res.status(404).send({message: 'Level stat update failed'});   
                 }  
             }
             
@@ -222,7 +221,7 @@ class levelModeLevelStatController{
             const idNivel1 = req.query.idNivel;
             const idUsuario1 = req.query.idUsuario;
             
-            const nivel = await levelModeLevelStatsModel.destroy({where: {idNivel:idNivel1, idUsuario:idUsuario1}});
+            const nivel = await levelModeStatsModel.destroy({where: {idNivel:idNivel1, idUsuario:idUsuario1}});
             
             if(nivel) {
                 res.status(200).send(

@@ -1,13 +1,109 @@
 import { Sequelize, where } from 'sequelize';
 import dailyLevelStatsModel from '../models/estadisticasNivelDiario.js';
-import playerModel from '../models/Jugadores.js';
+import playerModel from '../models/jugadores.js';
 import dailyLevelModel from '../models/nivelesDiarios.js';
 
 class playerController{
     constructor(){
-       this.timerMidnight(); 
+       this.timerMidnight();
     }
     
+    validateInputs(input, operation,query){
+        const min = 0;
+        const max = 10;
+        const groups = 8;
+        function between (num){
+            return (num >= min && num <= max);
+        }
+        function isANum (a){
+            return (a == "0" || a == "1" || a == "2" || a == "3" || a == "4" || a == "5" || a == "6" || a == "7" || a == "8" || a == "9");
+        }
+        function checkLevelGroupList (list){
+            for(let i = 7; i<7+9*groups+1; i=i+9){
+                if (isANum(list[i])){
+                    
+                }
+                else{
+                    return false;
+                }
+                if (isANum(list[i+1])){
+                    
+                    if (!between(parseInt(list[i]+list[i+1]))){
+                        return false;
+                    }
+                }
+                
+                if (!between(parseInt(list[i]))){
+                    return false;
+                }
+            } 
+            return true;
+        }
+        class Resultado{
+            constructor (code, messageR){
+                this.code = code;
+                this.messageR = messageR;
+            }
+        }
+        if ((input.idUsuario != query && operation == "update") || (input.idUsuario != query.idUsuario && operation == "create")){
+            return new Resultado(400, 'Data in body and params of request is different')
+        }
+        if (typeof(input.idUsuario) != "string"){
+            return new Resultado(400, 'Invalid user id format');
+        }
+        if (typeof(input.nombreUsuario) != "string"){
+            return new Resultado(400, 'Invalid user name format');
+        }
+        if (typeof(input.listaCantidadNivelesCompletadosGrupo) != "string"){
+            return new Resultado(400, 'Invalid list of completed levels by group format');
+        }
+        else if(!checkLevelGroupList(input.listaCantidadNivelesCompletadosGrupo.toString())){
+            return new Resultado(422, 'At least one of completed levels by group is invalid');
+        }
+        if (typeof(input.cantidadNivelesDiariosCompletados) != "number"){
+            return new Resultado(400, 'Invalid daily levels completed format');
+        }
+        else if((input.cantidadNivelesDiariosCompletados != 0 && operation == "create") || (input.cantidadNivelesDiariosCompletados < 0 && operation == "update")){
+            return new Resultado(422, 'Invalid daily levels completed value');
+        }
+        if (typeof(input.cantidadPistas) != "number"){
+            return new Resultado(400, 'Invalid number of clues format');
+        }
+        else if((input.cantidadPistas != 5 && operation == "create") || (input.cantidadPistas < 0 && operation == "update")){
+            return new Resultado(422, 'Invalid number of clues value');
+        }
+        if (typeof(input.cantidadPistasAux) != "number"){
+            return new Resultado(400, 'Invalid number of clues aux format');
+        }
+        else if((input.cantidadPistasAux != 0 && operation == "create") || (input.cantidadPistasAux < 0 && operation == "update")){
+            return new Resultado(422, 'Invalid number of clues aux value');
+        }
+        if (typeof(input.mejorTiempoNivelDiario) != "number"){
+            return new Resultado(400, 'Invalid best daily level time format');
+        }
+        else if((input.mejorTiempoNivelDiario != 1000.0 && operation == "create") || (input.mejorTiempoNivelDiario < 0 && operation == "update")){
+            return new Resultado(422, 'Invalid best daily level time value');
+        }
+        if (typeof(input.mejorPuestoClasificacionEnPorcentaje) != "number"){
+            return new Resultado(400, 'Invalid best number of classification % format');
+        }
+        else if((input.mejorPuestoClasificacionEnPorcentaje != 100.0 && operation == "create") || (input.mejorPuestoClasificacionEnPorcentaje < 0 && operation == "update")){
+            return new Resultado(422, 'Invalid best number of classification % value');
+        }
+        if (typeof(input.cantidadVecesClasificacion1) != "number"){
+            return new Resultado(400, 'Invalid number of classification 1% format');
+        }
+        else if((input.cantidadVecesClasificacion1 != 0 && operation == "create") || (input.cantidadVecesClasificacion1 < 0 && operation == "update")){
+            return new Resultado(422, 'Invalid number of classification 1% value');
+        }
+        if (typeof(input.opciones) != "string"){
+            return new Resultado(400, 'Invalid options format');
+        }
+        else{
+            return new Resultado(200, 'OK');
+        }  
+    }
+
     async timerMidnight(){
         function timeToMidnight(){
             const fecha1 = new Date();
@@ -22,16 +118,14 @@ class playerController{
             };
             const fechaArgentina = new Intl.DateTimeFormat('en-US', opciones).format(fecha1);
             const fechaHoy = new Date(fechaArgentina);
-            console.log(fechaHoy);
             const fecha2 = new Date(fechaHoy);
             fecha2.setDate(fechaHoy.getDate()+1);
             fecha2.setHours(0,0,0,0);
-            console.log(fecha2);
             if (fecha2-fechaHoy < 0){
                 return 0;
             }
             else{
-                return 0;
+                return fecha2-fechaHoy;
             }
         }
         setTimeout(this.finalDailyUpdate, timeToMidnight());
@@ -39,129 +133,19 @@ class playerController{
     }
     
     async create (req, res) {
-        const min = 0;
-        const max = 10;
-        const groups = 8;
-        function between (num){
-            return (num >= min && num <= max);
-        }
-        function isANum (a){
-            return (a == "0" || a == "1" || a == "2" || a == "3" || a == "4" || a == "5" || a == "6" || a == "7" || a == "8" || a == "9");
-        }
-        function checkLevelGroupList (list){
-            
-          
-            for(let i = 7; i<7+9*groups+1; i=i+9){
-                
-                
-                if (isANum(list[i])){
-                    
-                }
-                else{
-                    return false;
-                }
-                if (isANum(list[i+1])){
-                    
-                    if (!between(parseInt(list[i]+list[i+1]))){
-                        return false;
-                    }
-                }
-                
-                if (!between(parseInt(list[i]))){
-                    return false;
-                }
-                
-                
-                
-            } 
-            return true;
-        }    
         try{
-            let aux = 0;
-                if (typeof(req.body.idUsuario) != "string"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid user id format'});
-                }
-                if (typeof(req.body.nombreUsuario) != "string"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid user name format'});
-                }
-                //console.log('CHAU');
-                if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid list of completed levels by group format'});
-                }
-                else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo.toString())){
-                    aux += 1;
-                    res.status(422).send({message: 'At least one of completed levels by group is invalid'})
-                }
-                if (typeof(req.body.cantidadNivelesDiariosCompletados) != "number"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid daily levels completed format'});
-                }
-                else if(req.body.cantidadNivelesDiariosCompletados != 0){
-                    aux += 1;
-                    res.status(422).send({message: 'Invalid daily levels completed value'});
-                }
-                console.log('CHAU X2');
-                if (typeof(req.body.cantidadPistas) != "number"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid number of clues format'});
-                }
-                else if(req.body.cantidadPistas != 5){
-                    aux += 1;
-                    res.status(422).send({message: 'Invalid number of clues value'});
-                }
-                if (typeof(req.body.cantidadPistasAux) != "number"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid number of clues aux format'});
-                }
-                else if(req.body.cantidadPistasAux != 0){
-                    aux += 1;
-                    res.status(422).send({message: 'Invalid number of clues aux value'});
-                }
-                if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid best daily level time format'});
-                }
-                else if(req.body.mejorTiempoNivelDiario != 1000.0){
-                    aux += 1;
-                    res.status(422).send({message: 'Invalid best daily level time value'});
-                }
-                if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid best number of classification % format'});
-                }
-                else if(req.body.mejorPuestoClasificacionEnPorcentaje != 100.0){
-                    aux += 1;
-                    res.status(422).send({message: 'Invalid best number of classification % value'});
-                }
-                if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
-                    aux += 1;
-                    res.status(400).send({message: 'Invalid number of classification 1% format'});
-                }
-                else if(req.body.cantidadVecesClasificacion1 != 0){
-                    aux += 1;
-                    res.status(422).send({message: 'Invalid number of classification 1% value'});
-                }
-            if (aux == 0){
+            const object = new playerController();
+            const aux = object.validateInputs(req.body,"create",req.body);
+            //console.log(aux);
+            if (aux.code == 200){
                 const player = await playerModel.create(req.body);
-                
                 if (player)
                     res.status(201).send({message: 'Player created succesfully'});
-            }    
-            
-        
-        }catch (e) {
-            res.status(500).send({error: e});
-        }
-    }
-
-    async getAll (req, res) {
-        try{
-            const where = {...req.query};
-            const lista = await playerModel.findAll({where});
-            res.status(200).send(lista);    
+            }
+            else{
+                res.status(aux.code).send({message: aux.messageR});
+            }
+            object = null;    
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -169,17 +153,12 @@ class playerController{
 
     async getOne (req, res) {
         try{
-            
-            const { idUsuario } = req.params;
+            const {idUsuario} = req.params;
             const player = await playerModel.findByPk(idUsuario);
-            
             if(player) {
                 res.status(200).send(player);
-                console.log(res);
             }else{
-                res.status(404).send(
-                    {message: 'Player not found'}
-                );   
+                res.status(404).send({message: 'Player not found'});   
             }    
         }catch (e) {
             res.status(500).send({error: e});
@@ -187,132 +166,24 @@ class playerController{
     }
 
     async update (req, res) {
-        const min = 0;
-        const max = 10;
-        const groups = 8;
-        function between (num){
-            return (num >= min && num <= max);
-        }
-        function isANum (a){
-            return (a == "0" || a == "1" || a == "2" || a == "3" || a == "4" || a == "5" || a == "6" || a == "7" || a == "8" || a == "9");
-        }
-        function checkLevelGroupList (list){
-            
-          
-            for(let i = 7; i<7+9*groups+1; i=i+9){
-                
-                
-                if (isANum(list[i])){
-                    
-                }
-                else{
-                    return false;
-                }
-                if (isANum(list[i+1])){
-                    
-                    if (!between(parseInt(list[i]+list[i+1]))){
-                        return false;
-                    }
-                }
-                
-                if (!between(parseInt(list[i]))){
-                    return false;
-                }
-                
-                
-                
-            } 
-            return true;
-        }    
         try{
-            const idUsuario1 = req.params.idUsuario;
-            //console.log(req.params);
-            const data = {...req.body};
-            let aux = 0;
-            if (data.idUsuario != idUsuario1){
-                aux += 1;
-                res.status(400).send(
-                    {message: 'Data in body and query of request is different'}
-                );
-            }
-            
-            //console.log('CHAU');
-            if (typeof(req.body.listaCantidadNivelesCompletadosGrupo) != "string"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid list of completed levels by group format'});
-            }
-            if (typeof(req.body.nombreUsuario) != "string"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid user name format'});
-            }
-            else if(!checkLevelGroupList(req.body.listaCantidadNivelesCompletadosGrupo)){
-                aux += 1;
-                res.status(422).send({message: 'At least one of completed levels by group is invalid'})
-            }
-            if (typeof(req.body.cantidadNivelesDiariosCompletados) != "number"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid daily levels completed format'});
-            }
-            else if (req.body.cantidadNivelesDiariosCompletados < 0){
-                aux += 1;
-                res.status(422).send({message: 'Invalid daily levels completed value'});
-            }
-            if (typeof(req.body.cantidadPistas) != "number"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid number of clues format'});
-            }
-            else if (req.body.cantidadPistas < 0){
-                aux += 1;
-                res.status(422).send({message: 'Invalid number of clues value'});
-            }
-            if (typeof(req.body.cantidadPistasAux) != "number"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid number of clues aux format'});
-            }
-            else if(req.body.cantidadPistasAux < 0){
-                aux += 1;
-                res.status(422).send({message: 'Invalid number of clues aux value'});
-            }
-            if (typeof(req.body.mejorTiempoNivelDiario) != "number"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid best daily level time format'});
-            }
-            else if (req.body.mejorTiempoNivelDiario < 0){
-                aux += 1;
-                res.status(422).send({message: 'Invalid best daily level time value'});
-            }
-            if (typeof(req.body.mejorPuestoClasificacionEnPorcentaje) != "number"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid best number of classification % format'});
-            }
-            else if (req.body.mejorPuestoClasificacionEnPorcentaje < 0){
-                aux += 1;
-                res.status(422).send({message: 'Invalid best number of classification % value'});
-            }
-            if (typeof(req.body.cantidadVecesClasificacion1) != "number"){
-                aux += 1;
-                res.status(400).send({message: 'Invalid number of classification 1% format'});
-            }
-            else if (req.body.cantidadVecesClasificacion1 < 0){
-                aux += 1;
-                res.status(422).send({message: 'Invalid number of classification 1% value'});
-            }
-            if (aux == 0){
-                const player = await playerModel.update({nombreUsuario:data.nombreUsuario,listaCantidadNivelesCompletadosGrupo:data.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:data.cantidadNivelesDiariosCompletados,cantidadPistas:data.cantidadPistas,cantidadPistasAux:data.cantidadPistasAux,mejorTiempoNivelDiario:data.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:data.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:data.cantidadVecesClasificacion1},
-                    {where: {idUsuario:idUsuario1}});
-                
+            const object = new playerController();
+            const aux = object.validateInputs(req.body,'update',req.params.idUsuario);
+            if (aux.code == 200){
+                const player = await playerModel.update({nombreUsuario:req.body.nombreUsuario,listaCantidadNivelesCompletadosGrupo:req.body.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:req.body.cantidadNivelesDiariosCompletados,cantidadPistas:req.body.cantidadPistas,cantidadPistasAux:req.body.cantidadPistasAux,mejorTiempoNivelDiario:req.body.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:req.body.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:req.body.cantidadVecesClasificacion1},
+                    {where: {idUsuario:req.params.idUsuario}});
                 if (typeof (player[0]) != 'undefined' && player[0] === 1){
-                    res.status(200).send({
-                        message: 'Player updated succesfully'
-                    });
+                    res.status(200).send({message: 'Player updated succesfully'});
                 }else{
                     res.status(404).send(
                         {message: 'Player not found'}
                     );   
                 }  
             }
-            
-
+            else{
+                res.status(aux.code).send({message: aux.messageR});
+            }
+            object = null;
         }catch (e) {
             res.status(500).send({error: e});
         }
@@ -331,17 +202,16 @@ class playerController{
                 second: '2-digit'
             };
             const fechaArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(fecha1);
-            console.log(fechaArgentina);
             const fecha2 = fechaArgentina.toString().slice(0,2) + fechaArgentina.toString().slice(3,5) + fechaArgentina.toString().slice(6,10);
             return fecha2;
         }
-        function mejorPuesto(anteriorPuestoPorcentaje, nuevoPuesto, cantidad){
-            const nuevopuestoPorcentaje = parseFloat(nuevoPuesto)/parseFloat(cantidad) 
-            if (anteriorPuestoPorcentaje < nuevopuestoPorcentaje){
-                return anteriorPuestoPorcentaje;
+        function mejorPuesto(anteriorPuestoPorcent, nuevoPuesto, cantidad){
+            const nuevoPuestoPorcent = parseFloat(nuevoPuesto)/parseFloat(cantidad)*100 
+            if (anteriorPuestoPorcent < nuevoPuestoPorcent){
+                return anteriorPuestoPorcent;
             }
             else{
-                return nuevopuestoPorcentaje;
+                return nuevoPuestoPorcent;
             }
         }
         function actualizarClasificacion1(cantidadClasificaciones,estadoClasificacion1){
@@ -353,13 +223,9 @@ class playerController{
             }
         }
         function diaAnterior(){
-            // ARREGLAR ERROR EN FECHA NO USAR SLICE SINO TOLOCALESTRING
             const fecha = fechaActual();
-            console.log(fecha);
-            let hoy = fecha.slice(4,8) + '-' + fecha.slice(2,4) + '-' + fecha.slice(0,2);
-            const diaHoy = new Date(hoy)
+            const diaHoy = new Date(fecha.slice(4,8) + '-' + fecha.slice(2,4) + '-' + fecha.slice(0,2));
             const ayer = diaHoy;
-            console.log(diaHoy.getDate());
             ayer.setDate(diaHoy.getDate());
             const opciones = {
                 timeZone: 'America/Argentina/Buenos_Aires',
@@ -371,10 +237,7 @@ class playerController{
                 second: '2-digit'
             };
             const ayerArgentina = new Intl.DateTimeFormat('es-AR', opciones).format(diaHoy);
-            const fechaAyer = ayerArgentina.toString().slice(0,2) + ayerArgentina.toString().slice(3,5) + ayerArgentina.toString().slice(6,10)
-            console.log(ayerArgentina);
-            console.log(fechaAyer);
-            return fechaAyer;
+            return ayerArgentina.toString().slice(0,2) + ayerArgentina.toString().slice(3,5) + ayerArgentina.toString().slice(6,10)
         }
         async function updateAll(){
             const fechaAnterior = diaAnterior();
@@ -411,7 +274,6 @@ class playerController{
                         
                     }else{
                         res.status(500);
-                        console.log(res);
                         return res;  
                     }  
                 });
@@ -420,12 +282,11 @@ class playerController{
             else{
                 res.status(404);
             }            
-            console.log(res);
             return res;
         }
         
             const update = await updateAll();
-            console.log(update);
+            
             if (update.status() == 200){
                 res.status(200).send({message:'Final Daily Update Successfully Completed'});
             }
@@ -444,13 +305,9 @@ class playerController{
             const player = await playerModel.destroy({where: {idUsuario}});
             
             if(player) {
-                res.status(200).send(
-                    {message: 'Player deleted succesfully'}
-                );
+                res.status(200).send({message: 'Player deleted succesfully'});
             }else{
-                res.status(404).send(
-                    {message: 'Player not found'}
-                );   
+                res.status(404).send({message: 'Player not found'});   
             }    
 
         }catch (e) {
