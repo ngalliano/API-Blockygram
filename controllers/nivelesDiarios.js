@@ -11,14 +11,8 @@ class dailyLevelController{
         let year = '';
         function isValidIL(fecha){
             if (fecha.toString().length == 7){
-                if (fecha.toString()[1] == '0'){
-                    day = fecha.toString().slice(0,2)
-                    month = fecha.toString()[2];
-                }
-                else {
-                    day = fecha.toString()[0];
-                    month = fecha.toString().slice(1,3);
-                }
+                day = fecha.toString()[0];
+                month = fecha.toString().slice(1,3);
                 year = fecha.toString().slice(3);
             }
             else if(fecha.toString().length == 8){

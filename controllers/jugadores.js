@@ -81,7 +81,7 @@ class playerController{
         if (typeof(input.mejorTiempoNivelDiario) != "number"){
             return new Resultado(400, 'Invalid best daily level time format');
         }
-        else if((input.mejorTiempoNivelDiario != 1000.0 && operation == "create") || (input.mejorTiempoNivelDiario < 0 && operation == "update")){
+        else if((input.mejorTiempoNivelDiario != 5999.999 && operation == "create") || (input.mejorTiempoNivelDiario < 0 && operation == "update")){
             return new Resultado(422, 'Invalid best daily level time value');
         }
         if (typeof(input.mejorPuestoClasificacionEnPorcentaje) != "number"){
