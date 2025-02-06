@@ -140,7 +140,7 @@ class playerController{
             if (aux.code == 200){
                 const player = await playerModel.create(req.body);
                 if (player)
-                    res.status(201).send({message: 'Player created succesfully'});
+                    res.status(201).send({message: 'Player created successfully'});
             }
             else{
                 res.status(aux.code).send({message: aux.messageR});
@@ -173,7 +173,7 @@ class playerController{
                 const player = await playerModel.update({nombreUsuario:req.body.nombreUsuario,listaCantidadNivelesCompletadosGrupo:req.body.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:req.body.cantidadNivelesDiariosCompletados,cantidadPistas:req.body.cantidadPistas,cantidadPistasAux:req.body.cantidadPistasAux,mejorTiempoNivelDiario:req.body.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:req.body.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:req.body.cantidadVecesClasificacion1},
                     {where: {idUsuario:req.params.idUsuario}});
                 if (typeof (player[0]) != 'undefined' && player[0] === 1){
-                    res.status(200).send({message: 'Player updated succesfully'});
+                    res.status(200).send({message: 'Player updated successfully'});
                 }else{
                     res.status(404).send(
                         {message: 'Player not found'}
@@ -305,7 +305,7 @@ class playerController{
             const player = await playerModel.destroy({where: {idUsuario}});
             
             if(player) {
-                res.status(200).send({message: 'Player deleted succesfully'});
+                res.status(200).send({message: 'Player deleted successfully'});
             }else{
                 res.status(404).send({message: 'Player not found'});   
             }    

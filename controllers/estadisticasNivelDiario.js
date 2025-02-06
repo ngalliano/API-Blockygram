@@ -124,7 +124,7 @@ class dailyLevelStatController{
                                 }
                             };
                             await playerController.update(req2, res2);
-                            res.status(201).send({message: 'Daily level stat created succesfully'});
+                            res.status(201).send({message: 'Daily level stat created successfully'});
                         }
                     }
                 }
@@ -280,7 +280,7 @@ class dailyLevelStatController{
                 const nivel = await dailyLevelStatsModel.update({nombreUsuario:req.body.nombreUsuario,puestoClasificacion:req.body.puestoClasificacion, estadoClasificacion1:req.body.estadoClasificacion1},
                     {where: {idNivel:req.query.idNivel, idUsuario:req.query.idUsuario}});
                 if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                    res.status(200).send({message: 'Daily level stat updated succesfully'});
+                    res.status(200).send({message: 'Daily level stat updated successfully'});
                 }else{
                     res.status(404).send({message: 'Daily level stat not found'});   
                 }  
@@ -294,7 +294,7 @@ class dailyLevelStatController{
         try{
             const nivel = await dailyLevelStatsModel.destroy({where: {idNivel:req.query.idNivel, idUsuario:req.query.idUsuario}});
             if(nivel) {
-                res.status(200).send({message: 'Daily level stat deleted succesfully'});
+                res.status(200).send({message: 'Daily level stat deleted successfully'});
             }else{
                 res.status(404).send({message: 'Daily level stat not found'});   
             }    

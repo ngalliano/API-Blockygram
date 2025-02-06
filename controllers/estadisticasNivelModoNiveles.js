@@ -132,7 +132,7 @@ class levelModeLevelStatController{
                         }
                     };
                     await playerController.update(req2, res2);
-                    res.status(201).send({message: 'Level stat created succesfully'});
+                    res.status(201).send({message: 'Level stat created successfully'});
                         
                 }
             }
@@ -205,7 +205,7 @@ class levelModeLevelStatController{
                     {where: {idNivel:idNivel1, idUsuario:idUsuario1}});
                 //console.log('Hola');            
                 if (typeof (nivel[0]) != 'undefined' && nivel[0] === 1){
-                    res.status(200).send({message: 'Level stat updated succesfully'});
+                    res.status(200).send({message: 'Level stat updated successfully'});
                 }else{
                     res.status(404).send({message: 'Level stat update failed'});   
                 }  
@@ -225,7 +225,7 @@ class levelModeLevelStatController{
             
             if(nivel) {
                 res.status(200).send(
-                    {message: 'Level stat deleted succesfully'}
+                    {message: 'Level stat deleted successfully'}
                 );
             }else{
                 res.status(404).send(
