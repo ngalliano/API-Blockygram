@@ -12,11 +12,6 @@ const rutas = [
         handler: playerController.create,
     },
     {
-        method: "GET",
-        url: "/jugadores",
-        handler: playerController.getAll, 
-    },
-    {
         method: "PUT",
         url: "/jugadores/actualizacion",
         handler: playerController.finalDailyUpdate, 
@@ -41,11 +36,6 @@ const rutas = [
         method: "POST",
         url: "/nivelesDiarios",
         handler: dailyLevelController.create,
-    },
-    {
-        method: "GET",
-        url: "/nivelesDiarios",
-        handler: dailyLevelController.getAll, 
     },
     {
         method: "GET",
@@ -75,8 +65,8 @@ const rutas = [
     },
     {
         method: "GET",
-        url: "/estadisticasnivelesDiarios",
-        handler: dailyLevelStatController.getAll, 
+        url: "/estadisticasnivelesDiarios/:data",
+        handler: dailyLevelStatController.getOne, 
     },
     {
         method: "GET",
@@ -87,11 +77,6 @@ const rutas = [
         method: "GET",
         url: "/estadisticasnivelesDiarios/topJugador/:idUsuario",
         handler: dailyLevelStatController.getPlayerPositionGroup, 
-    },
-    {
-        method: "GET",
-        url: "/estadisticasnivelesDiarios/:data1",
-        handler: dailyLevelStatController.getOne, 
     },
     {
         method: "PUT",

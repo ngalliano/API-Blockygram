@@ -40,6 +40,10 @@ const playerModel = db.define('jugadores', {
         type: sequilize.INTEGER,
         allowNull: false,
     },
+    opciones:{
+        type: sequilize.STRING,
+        allowNull: false,
+    },
 })
 
 export default playerModel;

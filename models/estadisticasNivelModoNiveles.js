@@ -1,9 +1,9 @@
 import sequilize, { Sequelize } from 'sequelize';
 import db from '../db.js';
-import playerModel from './Jugadores.js';
+import playerModel from './jugadores.js';
 
 
-const levelModeLevelStatsModel = db.define('estadisticasNivelModoNiveles', {
+const levelModeStatsModel = db.define('estadisticasNivelModoNiveles', {
     idNivel: {
         type: sequilize.INTEGER,
         primaryKey: true,
@@ -15,7 +15,7 @@ const levelModeLevelStatsModel = db.define('estadisticasNivelModoNiveles', {
     },
 });
 
-playerModel.hasMany(levelModeLevelStatsModel, {
+playerModel.hasMany(levelModeStatsModel, {
     foreignKey: {
         name: 'idUsuario',
         type: sequilize.STRING,
@@ -24,4 +24,4 @@ playerModel.hasMany(levelModeLevelStatsModel, {
     }
 });
 
-export default levelModeLevelStatsModel;
+export default levelModeStatsModel;

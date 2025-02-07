@@ -1,6 +1,6 @@
 import sequilize, { Sequelize } from 'sequelize';
 import db from '../db.js';
-import playerModel from './Jugadores.js';
+import playerModel from './jugadores.js';
 import dailyLevelModel from './nivelesDiarios.js';
 
 const dailyLevelStatsModel = db.define('estadisticasNivelDiario', {
@@ -18,14 +18,9 @@ const dailyLevelStatsModel = db.define('estadisticasNivelDiario', {
     },
 });
 
-playerModel.hasMany(dailyLevelStatsModel, {
-    foreignKey: {
-        name: 'idUsuario',
-        type: sequilize.STRING,
-        primaryKey: true,
-        allowNull: false,
-    }
-});
+dailyLevelStatsModel.belongsTo(playerModel, { foreignKey: "idUsuario" });
+playerModel.hasMany(dailyLevelStatsModel, { foreignKey: "idUsuario" });
+
 
 dailyLevelModel.hasMany(dailyLevelStatsModel, {
     foreignKey: {
