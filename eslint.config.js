@@ -13,7 +13,7 @@ export default [
       "camelcase": ["error", { "properties": "always" }],
       "prefer-const": "error",
       "eslint-custom-rules/max-nested-for": "error",
-      "eslint-custom-rules/variableNameLength": ["error", { "maxLength": 20, "minLength": 3 }],
+      "eslint-custom-rules/variable-name-length": ["error", { "maxLength": 20, "minLength": 3 }],
     }
   }
 ];

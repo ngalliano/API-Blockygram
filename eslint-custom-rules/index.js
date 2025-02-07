@@ -26,7 +26,7 @@
             };
           }
         },
-        "variableNameLength": {
+        "variable-name-length": {
           meta: {
             type: "suggestion",
             docs: {
