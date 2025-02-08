@@ -170,7 +170,7 @@ class playerController{
             const object = new playerController();
             const aux = object.validateInputs(req.body,'update',req.params.idUsuario);
             if (aux.code == 200){
-                const player = await playerModel.update({nombreUsuario:req.body.nombreUsuario,listaCantidadNivelesCompletadosGrupo:req.body.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:req.body.cantidadNivelesDiariosCompletados,cantidadPistas:req.body.cantidadPistas,cantidadPistasAux:req.body.cantidadPistasAux,mejorTiempoNivelDiario:req.body.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:req.body.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:req.body.cantidadVecesClasificacion1},
+                const player = await playerModel.update({nombreUsuario:req.body.nombreUsuario,listaCantidadNivelesCompletadosGrupo:req.body.listaCantidadNivelesCompletadosGrupo, cantidadNivelesDiariosCompletados:req.body.cantidadNivelesDiariosCompletados,cantidadPistas:req.body.cantidadPistas,cantidadPistasAux:req.body.cantidadPistasAux,mejorTiempoNivelDiario:req.body.mejorTiempoNivelDiario,mejorPuestoClasificacionEnPorcentaje:req.body.mejorPuestoClasificacionEnPorcentaje,cantidadVecesClasificacion1:req.body.cantidadVecesClasificacion1,opciones:req.body.opciones},
                     {where: {idUsuario:req.params.idUsuario}});
                 if (typeof (player[0]) != 'undefined' && player[0] === 1){
                     res.status(200).send({message: 'Player updated successfully'});
