@@ -96,7 +96,7 @@ const rutas = [
     },
     {
         method: "GET",
-        url: "/estadisticasnivelesModoNiveles",
+        url: "/estadisticasnivelesModoNiveles/nivelesJugador/:idUsuario",
         handler: levelModeLevelStatController.getAll, 
     },
     {
