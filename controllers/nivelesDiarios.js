@@ -73,11 +73,8 @@ class dailyLevelController{
             //console.log(lista);
             for(let i=0; i<lista.length; i++){
                 //console.log(lista[i] != "0"|| lista[i] != "1" || lista[i] != "2");
-                if (lista[i] == "0" || lista[i] == "1" || lista[i] == "2"){
-                    
-                }
-                else{
-                    return false;
+                if (lista[i] != "0" && lista[i] != "1" && lista[i] != "2"){
+                    return false;    
                 }
             }
             return true;

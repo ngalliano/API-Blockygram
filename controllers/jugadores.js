@@ -20,19 +20,14 @@ class playerController{
         }
         function checkLevelGroupList (list){
             for(let i = 7; i<7+9*groups+1; i=i+9){
-                if (isANum(list[i])){
-                    
+                if (!isANum(list[i])){
+                    return false;    
                 }
-                else{
-                    return false;
-                }
-                if (isANum(list[i+1])){
-                    
+                else if (isANum(list[i+1])){
                     if (!between(parseInt(list[i]+list[i+1]))){
                         return false;
                     }
                 }
-                
                 if (!between(parseInt(list[i]))){
                     return false;
                 }
